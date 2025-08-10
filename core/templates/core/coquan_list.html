@@ -1,0 +1,39 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Cơ quan" %}{% endblock %}
+
+{% block content %}
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-slate-800">{% trans "Danh sách Cơ quan" %}</h1>
+        <a href="{% url 'coquan-create' %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">{% trans "Tạo Cơ quan mới" %}</a>
+    </div>
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">{% trans "Tên Cơ quan" %}</th>
+                    <th scope="col" class="relative px-6 py-3">
+                        <span class="sr-only">Actions</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-slate-200">
+                {% for coquan in coquan_list %}
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">{{ coquan.name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-4">
+                            <a href="{% url 'coquan-detail' coquan.pk %}" class="text-indigo-600 hover:text-indigo-900">{% trans "Xem" %}</a>
+                            <a href="{% url 'coquan-update' coquan.pk %}" class="text-green-600 hover:text-green-900">{% trans "Sửa" %}</a>
+                            <a href="{% url 'coquan-delete' coquan.pk %}" class="text-red-600 hover:text-red-900">{% trans "Xóa" %}</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="2" class="px-6 py-4 whitespace-nowrap text-center text-sm text-slate-500">{% trans "Không có cơ quan nào." %}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

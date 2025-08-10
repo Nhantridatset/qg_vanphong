@@ -1,0 +1,19 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{{ loainhiemvu.name }}{% endblock %}
+
+{% block content %}
+    <div class="form-container">
+        <h1 class="form-title">{{ loainhiemvu.name }}</h1>
+        <div class="bg-white shadow-md rounded-lg p-8 mb-6">
+            <p class="mb-4"><strong class="font-semibold">{% trans "Tên Loại Nhiệm Vụ" %}:</strong> {{ loainhiemvu.name }}</p>
+        </div>
+
+        <div class="flex space-x-4 mt-6">
+            <a href="{% url 'loainhiemvu_list' %}" class="form-button bg-gray-500 hover:bg-gray-700">{% trans "← Quay lại Danh sách Loại Nhiệm Vụ" %}</a>
+            <a href="{% url 'loainhiemvu_update' loainhiemvu.pk %}" class="form-button bg-yellow-500 hover:bg-yellow-700">{% trans "Sửa Loại Nhiệm Vụ" %}</a>
+            <a href="{% url 'loainhiemvu_delete' loainhiemvu.pk %}" class="form-button bg-red-500 hover:bg-red-700">{% trans "Xóa Loại Nhiệm Vụ" %}</a>
+        </div>
+    </div>
+{% endblock %}

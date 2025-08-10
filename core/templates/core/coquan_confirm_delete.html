@@ -1,0 +1,16 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Xác nhận Xóa Cơ quan" %}{% endblock %}
+
+{% block content %}
+    <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-md text-center">
+        <h1 class="text-2xl font-bold text-slate-800 mb-4">{% trans "Xác nhận Xóa Cơ quan" %}</h1>
+        <p class="text-slate-600 mb-6">{% trans "Bạn có chắc chắn muốn xóa" %} "<span class="font-semibold">{{ object.name }}</span>"{% trans " không? Hành động này không thể hoàn tác." %}</p>
+        <form method="post" class="flex justify-center space-x-4">
+            {% csrf_token %}
+            <button type="submit" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors">{% trans "Xóa" %}</button>
+            <a href="{% url 'coquan-detail' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors">{% trans "Hủy" %}</a>
+        </form>
+    </div>
+{% endblock %}

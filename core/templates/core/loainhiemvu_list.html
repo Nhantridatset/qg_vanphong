@@ -1,0 +1,35 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Loại Nhiệm Vụ" %}{% endblock %}
+
+{% block content %}
+    <div class="form-container">
+        <h1 class="form-title">{% trans "Danh sách Loại Nhiệm Vụ" %}</h1>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white rounded-lg shadow overflow-hidden">
+                <thead class="bg-gray-200 text-text">
+                    <tr>
+                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider">{% trans "Tên Loại Nhiệm Vụ" %}</th>
+                        <th class="py-3 px-4"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for loainhiemvu in loainhiemvus %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-3 px-4 whitespace-nowrap">{{ loainhiemvu.name }}</td>
+                            <td class="py-3 px-4 text-right whitespace-nowrap">
+                                <a href="{% url 'loainhiemvu_detail' loainhiemvu.pk %}" class="form-button bg-primary hover:bg-indigo-700 inline-block w-auto">{% trans "Xem" %}</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-6 text-center">
+            <a href="{% url 'loainhiemvu_create' %}" class="form-button bg-green-500 hover:bg-green-700 inline-block w-auto">{% trans "Thêm Loại Nhiệm Vụ" %}</a>
+        </div>
+    </div>
+{% endblock %}

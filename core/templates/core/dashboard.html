@@ -1,0 +1,103 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-800">Dashboard</h1>
+            <p class="text-slate-500">Welcome back, {{ user.username }}! ({{ user.get_role_display }})</p>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Role-specific information cards -->
+        {% if user.role == 'CHUYEN_VIEN' %}
+            <div class="md:col-span-2 lg:col-span-3 bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-xl font-semibold mb-3 text-slate-700">Nhiệm vụ được giao</h2>
+                <div class="space-y-3">
+                    {% for task in assigned_tasks %}
+                        <a href="{% url 'nhiemvu-detail' task.pk %}" class="block p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
+                            <p class="font-medium text-slate-800">{{ task.ten_nhiem_vu }}</p>
+                        </a>
+                    {% empty %}
+                        <p class="text-slate-500">Bạn không có nhiệm vụ nào được giao.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        {% elif user.role == 'LANH_DAO_PHONG' %}
+            <div class="md:col-span-2 lg:col-span-3 bg-white p-6 rounded-xl shadow-md mb-6">
+                <h2 class="text-xl font-semibold mb-3 text-slate-700">Hồ sơ công việc trong Phòng ban</h2>
+                {% for project in department_projects %}
+                    <a href="{% url 'hosocongviec-detail' project.pk %}" class="block p-3 rounded-lg bg-slate-50 hover:bg-slate-100">{{ project.ten_ho_so_cong_viec }}</a>
+                {% empty %}
+                    <p class="text-slate-500">Không có hồ sơ công việc nào trong phòng ban của bạn.</p>
+                {% endfor %}
+            </div>
+            <div class="md:col-span-2 lg:col-span-3 bg-white p-6 rounded-xl shadow-md mb-6">
+                <h2 class="text-xl font-semibold mb-3 text-slate-700">Kế hoạch của Phòng ban</h2>
+                {% for plan in department_plans %}
+                    <a href="{% url 'kehoach-detail' plan.pk %}" class="block p-3 rounded-lg bg-slate-50 hover:bg-slate-100">{{ plan.ten_ke_hoach }}</a>
+                {% empty %}
+                    <p class="text-slate-500">Không có kế hoạch nào trong phòng ban của bạn.</p>
+                {% endfor %}
+            </div>
+            <div class="md:col-span-2 lg:col-span-3 bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-xl font-semibold mb-3 text-slate-700">Nhiệm vụ trong phòng ban</h2>
+                {% for task in department_tasks %}
+                    <a href="{% url 'nhiemvu-detail' task.pk %}" class="block p-3 rounded-lg bg-slate-50 hover:bg-slate-100">{{ task.ten_nhiem_vu }}</a>
+                {% empty %}
+                    <p class="text-slate-500">Không có nhiệm vụ nào trong phòng ban của bạn.</p>
+                {% endfor %}
+            </div>
+        {% elif user.role == 'LANH_DAO_CO_QUAN' %}
+            <div class="md:col-span-2 lg:col-span-3 bg-white p-6 rounded-xl shadow-md mb-6">
+                <h2 class="text-xl font-semibold mb-3 text-slate-700">Hồ sơ công việc của Cơ quan</h2>
+                {% for project in agency_projects %}
+                    <a href="{% url 'hosocongviec-detail' project.pk %}" class="block p-3 rounded-lg bg-slate-50 hover:bg-slate-100">{{ project.ten_ho_so_cong_viec }}</a>
+                {% empty %}
+                    <p class="text-slate-500">Không có hồ sơ công việc nào trong cơ quan của bạn.</p>
+                {% endfor %}
+            </div>
+            <div class="md:col-span-2 lg:col-span-3 bg-white p-6 rounded-xl shadow-md mb-6">
+                <h2 class="text-xl font-semibold mb-3 text-slate-700">Kế hoạch của Cơ quan</h2>
+                {% for plan in agency_plans %}
+                    <a href="{% url 'kehoach-detail' plan.pk %}" class="block p-3 rounded-lg bg-slate-50 hover:bg-slate-100">{{ plan.ten_ke_hoach }}</a>
+                {% empty %}
+                    <p class="text-slate-500">Không có kế hoạch nào trong cơ quan của bạn.</p>
+                {% endfor %}
+            </div>
+            <div class="md:col-span-2 lg:col-span-3 bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-xl font-semibold mb-3 text-slate-700">Nhiệm vụ của Cơ quan</h2>
+                {% for task in agency_tasks %}
+                    <a href="{% url 'nhiemvu-detail' task.pk %}" class="block p-3 rounded-lg bg-slate-50 hover:bg-slate-100">{{ task.ten_nhiem_vu }}</a>
+                {% empty %}
+                    <p class="text-slate-500">Không có nhiệm vụ nào trong cơ quan của bạn.</p>
+                {% endfor %}
+            </div>
+        {% elif user.is_superuser or user.role == 'ADMIN_TCI_CAO' or user.role == 'ADMIN_DON_VI' %}
+             <div class="md:col-span-2 lg:col-span-3 bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-xl font-semibold mb-3 text-slate-700">Tất cả Hồ sơ công việc</h2>
+                {% for project in all_projects %}
+                    <a href="{% url 'hosocongviec-detail' project.pk %}" class="block p-3 rounded-lg bg-slate-50 hover:bg-slate-100">{{ project.ten_ho_so_cong_viec }}</a>
+                {% empty %}
+                    <p class="text-slate-500">Không có hồ sơ công việc nào.</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- General navigation cards -->
+        <div class="bg-white p-6 rounded-xl shadow-md">
+            <h2 class="text-lg font-semibold text-slate-700">Hồ sơ công việc</h2>
+            <a href="{% url 'hosocongviec-list' %}" class="text-indigo-600 hover:text-indigo-800 mt-4 inline-block font-semibold">Xem chi tiết &rarr;</a>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md">
+            <h2 class="text-lg font-semibold text-slate-700">Kế hoạch</h2>
+            <a href="{% url 'kehoach-list' %}" class="text-indigo-600 hover:text-indigo-800 mt-4 inline-block font-semibold">Xem chi tiết &rarr;</a>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md">
+            <h2 class="text-lg font-semibold text-slate-700">Nhiệm vụ</h2>
+            <a href="{% url 'nhiemvu-list' %}" class="text-indigo-600 hover:text-indigo-800 mt-4 inline-block font-semibold">Xem chi tiết &rarr;</a>
+        </div>
+    </div>
+{% endblock %}

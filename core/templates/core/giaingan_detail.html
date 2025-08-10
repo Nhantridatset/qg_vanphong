@@ -1,0 +1,23 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{{ giaingan.dot_thanh_toan }}{% endblock %}
+
+{% block content %}
+    <div class="form-container">
+        <h1 class="form-title">{{ giaingan.dot_thanh_toan }}</h1>
+        <div class="bg-white shadow-md rounded-lg p-8 mb-6">
+            <p class="mb-4"><strong class="font-semibold">{% trans "Đợt Thanh Toán" %}:</strong> {{ giaingan.dot_thanh_toan }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Số Tiền" %}:</strong> {{ giaingan.so_tien }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Ngày Thanh Toán" %}:</strong> {{ giaingan.ngay_thanh_toan }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Nội Dung" %}:</strong> {{ giaingan.noi_dung }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Dự án" %}:</strong> <a href="{% url 'project_detail' giaingan.du_an.pk %}" class="text-primary hover:underline">{{ giaingan.du_an.name }}</a></p>
+        </div>
+
+        <div class="flex space-x-4 mt-6">
+            <a href="{% url 'giaingan_list' %}" class="form-button bg-gray-500 hover:bg-gray-700">{% trans "← Quay lại Danh sách Giải Ngân" %}</a>
+            <a href="{% url 'giaingan_update' giaingan.pk %}" class="form-button bg-yellow-500 hover:bg-yellow-700">{% trans "Sửa Giải Ngân" %}</a>
+            <a href="{% url 'giaingan_delete' giaingan.pk %}" class="form-button bg-red-500 hover:bg-red-700">{% trans "Xóa Giải Ngân" %}</a>
+        </div>
+    </div>
+{% endblock %}

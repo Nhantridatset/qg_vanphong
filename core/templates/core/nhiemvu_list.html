@@ -1,0 +1,44 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Danh sách Nhiệm vụ{% endblock %}
+
+{% block content %}
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-slate-800">Danh sách Nhiệm vụ</h1>
+        <a href="{% url 'nhiemvu-create' %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">Tạo Nhiệm vụ mới</a>
+    </div>
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Tên Nhiệm vụ</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Kế hoạch</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Trạng thái</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Mức độ ưu tiên</th>
+                    <th scope="col" class="relative px-6 py-3">
+                        <span class="sr-only">Actions</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-slate-200">
+                {% for nhiemvu in nhiemvu_list %}
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900"><a href="{% url 'nhiemvu-detail' nhiemvu.pk %}" class="text-indigo-600 hover:text-indigo-900">{{ nhiemvu.ten_nhiem_vu }}</a></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ nhiemvu.id_ke_hoach.ten_ke_hoach }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ nhiemvu.get_trang_thai_display }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ nhiemvu.get_muc_do_uu_tien_display }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-4">
+                            <a href="{% url 'nhiemvu-detail' nhiemvu.pk %}" class="text-indigo-600 hover:text-indigo-900">Xem</a>
+                            <a href="{% url 'nhiemvu-update' nhiemvu.pk %}" class="text-green-600 hover:text-green-900">Sửa</a>
+                            <a href="{% url 'nhiemvu-delete' nhiemvu.pk %}" class="text-red-600 hover:text-red-900">Xóa</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-sm text-slate-500">Không có nhiệm vụ nào.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

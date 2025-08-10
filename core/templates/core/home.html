@@ -1,0 +1,16 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Trang chủ" %}{% endblock %}
+
+{% block content %}
+    <div class="form-container text-center">
+        <h1 class="form-title">{% trans "Chào mừng đến với qg_vanphong!" %}</h1>
+        <p class="text-lg text-text mb-6">{% trans "Đây là trang chủ." %}</p>
+        {% if user.is_authenticated %}
+            <p class="text-md text-text mb-4">{% trans "Bạn đã đăng nhập với tên" %} {{ user.username }}. {% trans "Đi đến" %} <a href="{% url 'dashboard' %}" class="text-primary hover:underline font-semibold">{% trans "Bảng điều khiển" %}</a>.</p>
+        {% else %}
+            <p class="text-md text-text mb-4">{% trans "Vui lòng" %} <a href="{% url 'login' %}" class="text-primary hover:underline font-semibold">{% trans "Đăng nhập" %}</a> {% trans "để tiếp tục." %}</p>
+        {% endif %}
+    </div>
+{% endblock %}

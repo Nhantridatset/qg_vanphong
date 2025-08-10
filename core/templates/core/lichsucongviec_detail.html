@@ -1,0 +1,31 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Chi tiết Lịch Sử Công Việc" %}{% endblock %}
+
+{% block content %}
+    <div class="bg-white p-8 rounded-xl shadow-md">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-800">{% trans "Lịch Sử Công Việc" %}</h1>
+            </div>
+        </div>
+
+        <div class="mt-6 border-t border-slate-200 pt-6">
+            <h2 class="text-lg font-semibold text-slate-700 mb-2">{% trans "Thông tin Lịch Sử Công Việc" %}</h2>
+            <p class="text-slate-600 mb-2"><strong class="font-semibold">{% trans "Mô tả hành động" %}:</strong> {{ object.mo_ta }}</p>
+            <p class="text-slate-600 mb-2"><strong class="font-semibold">{% trans "Thời Gian" %}:</strong> {{ object.timestamp|date:"d/m/Y H:i" }}</p>
+            <p class="text-slate-600 mb-2"><strong class="font-semibold">{% trans "Người Thực Hiện" %}:</strong> {{ object.user.username }}</p>
+            <p class="text-slate-600 mb-2"><strong class="font-semibold">{% trans "Nhiệm vụ" %}:</strong> <a href="{% url 'nhiemvu-detail' object.nhiem_vu.pk %}" class="text-indigo-600 hover:underline">{{ object.nhiem_vu.ten_nhiem_vu }}</a></p>
+            {% if object.details %}
+                <p class="text-slate-600 mb-2"><strong class="font-semibold">{% trans "Chi tiết" %}:</strong> {{ object.details }}</p>
+            {% endif %}
+        </div>
+
+        <div class="mt-8 flex items-center justify-start space-x-4">
+            <a href="{% url 'lichsucongviec-update' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">{% trans "Sửa" %}</a>
+            <a href="{% url 'lichsucongviec-delete' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors">{% trans "Xóa" %}</a>
+            <a href="{% url 'lichsucongviec-list' %}" class="px-4 py-2 rounded-md text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors">{% trans "Quay lại" %}</a>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Giá Trị Trường Dữ Liệu" %}{% endblock %}
+
+{% block content %}
+    <div class="form-container">
+        <h1 class="form-title">{% trans "Giá Trị Trường Dữ Liệu" %}</h1>
+        <div class="bg-white shadow-md rounded-lg p-8 mb-6">
+            <p class="mb-4"><strong class="font-semibold">{% trans "Giá Trị" %}:</strong> {{ giatritruongdulieu.value }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Công Việc" %}:</strong> <a href="{% url 'task_detail' giatritruongdulieu.cong_viec.pk %}" class="text-primary hover:underline">{{ giatritruongdulieu.cong_viec.title }}</a></p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Trường Dữ Liệu" %}:</strong> <a href="{% url 'truongdulieu_detail' giatritruongdulieu.truong_du_lieu.pk %}" class="text-primary hover:underline">{{ giatritruongdulieu.truong_du_lieu.field_name }}</a></p>
+        </div>
+
+        <div class="flex space-x-4 mt-6">
+            <a href="{% url 'giatritruongdulieu_list' %}" class="form-button bg-gray-500 hover:bg-gray-700">{% trans "← Quay lại Danh sách Giá Trị Trường Dữ Liệu" %}</a>
+            <a href="{% url 'giatritruongdulieu_update' giatritruongdulieu.pk %}" class="form-button bg-yellow-500 hover:bg-yellow-700">{% trans "Sửa Giá Trị Trường Dữ Liệu" %}</a>
+            <a href="{% url 'giatritruongdulieu_delete' giatritruongdulieu.pk %}" class="form-button bg-red-500 hover:bg-red-700">{% trans "Xóa Giá Trị Trường Dữ Liệu" %}</a>
+        </div>
+    </div>
+{% endblock %}

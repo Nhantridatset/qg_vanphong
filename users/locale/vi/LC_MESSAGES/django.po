@@ -1,0 +1,125 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-07 00:24+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: .\users\templates\users\login.html:4
+msgid "Login"
+msgstr "Đăng nhập"
+
+#: .\users\templates\users\login.html:8 .\users\templates\users\login.html:25
+msgid "Đăng nhập"
+msgstr ""
+
+#: .\users\templates\users\login.html:13
+#: .\users\templates\users\user_list.html:14
+msgid "Tên người dùng"
+msgstr ""
+
+#: .\users\templates\users\login.html:15
+msgid "Nhập tên người dùng"
+msgstr ""
+
+#: .\users\templates\users\login.html:19
+msgid "Mật khẩu"
+msgstr ""
+
+#: .\users\templates\users\login.html:21
+msgid "Nhập mật khẩu"
+msgstr ""
+
+#: .\users\templates\users\user_confirm_delete.html:4
+#: .\users\templates\users\user_detail.html:23
+msgid "Xóa Người dùng"
+msgstr ""
+
+#: .\users\templates\users\user_confirm_delete.html:8
+msgid "Xác nhận xóa Người dùng"
+msgstr ""
+
+#: .\users\templates\users\user_confirm_delete.html:10
+msgid "Bạn có chắc chắn muốn xóa"
+msgstr ""
+
+#: .\users\templates\users\user_confirm_delete.html:13
+msgid "Xóa"
+msgstr ""
+
+#: .\users\templates\users\user_confirm_delete.html:14
+msgid "Hủy"
+msgstr ""
+
+#: .\users\templates\users\user_detail.html:10
+#: .\users\templates\users\user_list.html:15
+msgid "Email"
+msgstr ""
+
+#: .\users\templates\users\user_detail.html:11
+#: .\users\templates\users\user_list.html:16
+msgid "Vai trò"
+msgstr ""
+
+#: .\users\templates\users\user_detail.html:13
+msgid "Cơ quan"
+msgstr ""
+
+#: .\users\templates\users\user_detail.html:16
+msgid "Phòng Ban"
+msgstr ""
+
+#: .\users\templates\users\user_detail.html:21
+msgid "← Quay lại Danh sách Người dùng"
+msgstr ""
+
+#: .\users\templates\users\user_detail.html:22
+msgid "Sửa Người dùng"
+msgstr ""
+
+#: .\users\templates\users\user_form.html:4
+#: .\users\templates\users\user_form.html:8
+msgid "Biểu mẫu Người dùng"
+msgstr ""
+
+#: .\users\templates\users\user_form.html:28
+msgid "Lưu"
+msgstr ""
+
+#: .\users\templates\users\user_list.html:4
+msgid "Người dùng"
+msgstr ""
+
+#: .\users\templates\users\user_list.html:8
+msgid "Danh sách Người dùng"
+msgstr ""
+
+#: .\users\templates\users\user_list.html:27
+msgid "Xem"
+msgstr ""
+
+#: .\users\templates\users\user_list.html:36
+msgid "Thêm Người dùng"
+msgstr ""
+
+#~ msgid "Username"
+#~ msgstr "Tên người dùng"
+
+#~ msgid "Password"
+#~ msgstr "Mật khẩu"
+
+#~ msgid "Sign In"
+#~ msgstr "Đăng nhập"

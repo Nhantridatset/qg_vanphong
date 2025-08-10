@@ -1,0 +1,32 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.[oa]
+*.so
+
+# C extensions
+*.pyd
+*.dll
+
+# Database
+db.sqlite3
+*.sql
+
+# Environment variables
+.env
+.venv
+env/
+venv/
+ENV/
+VENV/
+
+# Media files
+/media/
+
+# Static files (if collected)
+/static_root/
+
+# IDE / Editor specific
+.idea/
+.vscode/
+*.swp

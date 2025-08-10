@@ -1,0 +1,24 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{{ project.name }}{% endblock %}
+
+{% block content %}
+    <div class="form-container">
+        <h1 class="form-title">{{ project.name }}</h1>
+        <div class="bg-white shadow-md rounded-lg p-8 mb-6">
+            <p class="mb-4"><strong class="font-semibold">{% trans "Mô tả" %}:</strong> {{ project.description }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Trạng thái" %}:</strong> {{ project.trang_thai_du_an }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Ngày bắt đầu" %}:</strong> {{ project.start_date }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Ngày kết thúc" %}:</strong> {{ project.end_date }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Chủ đầu tư" %}:</strong> {{ project.chu_dau_tu }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Tổng mức đầu tư" %}:</strong> {{ project.tong_muc_dau_tu }}</p>
+        </div>
+
+        <div class="flex space-x-4 mt-6">
+            <a href="{% url 'project_list' %}" class="form-button bg-gray-500 hover:bg-gray-700">{% trans "← Quay lại Danh sách Dự án" %}</a>
+            <a href="{% url 'project_update' project.pk %}" class="form-button bg-yellow-500 hover:bg-yellow-700">{% trans "Sửa Dự án" %}</a>
+            <a href="{% url 'project_delete' project.pk %}" class="form-button bg-red-500 hover:bg-red-700">{% trans "Xóa Dự án" %}</a>
+        </div>
+    </div>
+{% endblock %}

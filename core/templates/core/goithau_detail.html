@@ -1,0 +1,25 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{{ goithau.ten_goi_thau }}{% endblock %}
+
+{% block content %}
+    <div class="form-container">
+        <h1 class="form-title">{{ goithau.ten_goi_thau }}</h1>
+        <div class="bg-white shadow-md rounded-lg p-8 mb-6">
+            <p class="mb-4"><strong class="font-semibold">{% trans "Tên Gói Thầu" %}:</strong> {{ goithau.ten_goi_thau }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Giá Gói Thầu" %}:</strong> {{ goithau.gia_goi_thau }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Hình Thức Lựa Chọn" %}:</strong> {{ goithau.hinh_thuc_lua_chon }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Nhà Thầu Trúng Thầu" %}:</strong> {{ goithau.nha_thau_trung_thau }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Ngày Mở Thầu" %}:</strong> {{ goithau.ngay_mo_thau }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Ngày Phê Duyệt Kết Quả" %}:</strong> {{ goithau.ngay_phe_duyet_ket_qua }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Dự án" %}:</strong> <a href="{% url 'project_detail' goithau.du_an.pk %}" class="text-primary hover:underline">{{ goithau.du_an.name }}</a></p>
+        </div>
+
+        <div class="flex space-x-4 mt-6">
+            <a href="{% url 'goithau_list' %}" class="form-button bg-gray-500 hover:bg-gray-700">{% trans "← Quay lại Danh sách Gói Thầu" %}</a>
+            <a href="{% url 'goithau_update' goithau.pk %}" class="form-button bg-yellow-500 hover:bg-yellow-700">{% trans "Sửa Gói Thầu" %}</a>
+            <a href="{% url 'goithau_delete' goithau.pk %}" class="form-button bg-red-500 hover:bg-red-700">{% trans "Xóa Gói Thầu" %}</a>
+        </div>
+    </div>
+{% endblock %}

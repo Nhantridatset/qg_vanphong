@@ -1,0 +1,30 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Login" %}{% endblock %}
+
+{% block content %}
+    <div class="form-container">
+        <h2 class="form-title">{% trans "Đăng nhập" %}</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label" for="username">
+                    {% trans "Tên người dùng" %}
+                </label>
+                <input class="form-input" id="username" name="username" type="text" placeholder="{% trans "Nhập tên người dùng" %}">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="password">
+                    {% trans "Mật khẩu" %}
+                </label>
+                <input class="form-input" id="password" name="password" type="password" placeholder="{% trans "Nhập mật khẩu" %}">
+            </div>
+            <div class="flex items-center justify-center">
+                <button class="form-button" type="submit">
+                    {% trans "Đăng nhập" %}
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

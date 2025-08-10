@@ -1,0 +1,941 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-07 00:24+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: .\core\templates\core\base.html:7 .\core\templates\core\base.html:15
+msgid "qg_vanphong"
+msgstr "Văn phòng QG"
+
+#: .\core\templates\core\base.html:19
+msgid "Admin"
+msgstr "Quản trị"
+
+#: .\core\templates\core\base.html:20
+msgid "Logout"
+msgstr "Đăng xuất"
+
+#: .\core\templates\core\base.html:22
+msgid "Login"
+msgstr "Đăng nhập"
+
+#: .\core\templates\core\base.html:46 .\core\templates\core\task_detail.html:24
+#, fuzzy
+#| msgid "AI Gợi ý Dự thảo"
+msgid "Gợi ý Dự thảo AI"
+msgstr "Gợi ý Dự thảo AI"
+
+#: .\core\templates\core\base.html:50
+msgid "Đóng"
+msgstr ""
+
+#: .\core\templates\core\coquan_confirm_delete.html:4
+#: .\core\templates\core\coquan_detail.html:16
+#, fuzzy
+#| msgid "View All Cơ quan"
+msgid "Xóa Cơ quan"
+msgstr "Xem tất cả Cơ quan"
+
+#: .\core\templates\core\coquan_confirm_delete.html:8
+msgid "Xác nhận xóa Cơ quan"
+msgstr ""
+
+#: .\core\templates\core\coquan_confirm_delete.html:10
+#: .\core\templates\core\goithau_confirm_delete.html:10
+#: .\core\templates\core\loainhiemvu_confirm_delete.html:10
+#: .\core\templates\core\phongban_confirm_delete.html:10
+#: .\core\templates\core\project_confirm_delete.html:10
+#: .\core\templates\core\task_confirm_delete.html:10
+#: .\core\templates\core\truongdulieu_confirm_delete.html:10
+msgid "Bạn có chắc chắn muốn xóa"
+msgstr ""
+
+#: .\core\templates\core\coquan_confirm_delete.html:13
+#: .\core\templates\core\giaingan_confirm_delete.html:13
+#: .\core\templates\core\giatritruongdulieu_confirm_delete.html:13
+#: .\core\templates\core\goithau_confirm_delete.html:13
+#: .\core\templates\core\lichsucongviec_confirm_delete.html:13
+#: .\core\templates\core\loainhiemvu_confirm_delete.html:13
+#: .\core\templates\core\phongban_confirm_delete.html:13
+#: .\core\templates\core\project_confirm_delete.html:13
+#: .\core\templates\core\task_confirm_delete.html:13
+#: .\core\templates\core\tepdinhkem_confirm_delete.html:13
+#: .\core\templates\core\truongdulieu_confirm_delete.html:13
+msgid "Xóa"
+msgstr ""
+
+#: .\core\templates\core\coquan_confirm_delete.html:14
+#: .\core\templates\core\giaingan_confirm_delete.html:14
+#: .\core\templates\core\giatritruongdulieu_confirm_delete.html:14
+#: .\core\templates\core\goithau_confirm_delete.html:14
+#: .\core\templates\core\lichsucongviec_confirm_delete.html:14
+#: .\core\templates\core\loainhiemvu_confirm_delete.html:14
+#: .\core\templates\core\phongban_confirm_delete.html:14
+#: .\core\templates\core\project_confirm_delete.html:14
+#: .\core\templates\core\task_confirm_delete.html:14
+#: .\core\templates\core\tepdinhkem_confirm_delete.html:14
+#: .\core\templates\core\truongdulieu_confirm_delete.html:14
+msgid "Hủy"
+msgstr ""
+
+#: .\core\templates\core\coquan_detail.html:10
+#: .\core\templates\core\coquan_list.html:14
+#, fuzzy
+#| msgid "View All Cơ quan"
+msgid "Tên Cơ quan"
+msgstr "Xem tất cả Cơ quan"
+
+#: .\core\templates\core\coquan_detail.html:14
+msgid "← Quay lại Danh sách Cơ quan"
+msgstr ""
+
+#: .\core\templates\core\coquan_detail.html:15
+msgid "Sửa Cơ quan"
+msgstr ""
+
+#: .\core\templates\core\coquan_form.html:4
+#: .\core\templates\core\coquan_form.html:8
+msgid "Biểu mẫu Cơ quan"
+msgstr ""
+
+#: .\core\templates\core\coquan_form.html:28
+#: .\core\templates\core\giaingan_form.html:28
+#: .\core\templates\core\giatritruongdulieu_form.html:28
+#: .\core\templates\core\goithau_form.html:28
+#: .\core\templates\core\lichsucongviec_form.html:28
+#: .\core\templates\core\loainhiemvu_form.html:28
+#: .\core\templates\core\phongban_form.html:28
+#: .\core\templates\core\tepdinhkem_form.html:28
+#: .\core\templates\core\truongdulieu_form.html:28
+msgid "Lưu"
+msgstr ""
+
+#: .\core\templates\core\coquan_list.html:4
+#: .\core\templates\core\phongban_detail.html:10
+#: .\core\templates\core\phongban_list.html:15
+#, fuzzy
+#| msgid "View All Cơ quan"
+msgid "Cơ quan"
+msgstr "Xem tất cả Cơ quan"
+
+#: .\core\templates\core\coquan_list.html:8
+msgid "Danh sách Cơ quan"
+msgstr ""
+
+#: .\core\templates\core\coquan_list.html:23
+#: .\core\templates\core\giaingan_list.html:27
+#: .\core\templates\core\giatritruongdulieu_list.html:27
+#: .\core\templates\core\goithau_list.html:25
+#: .\core\templates\core\lichsucongviec_list.html:29
+#: .\core\templates\core\loainhiemvu_list.html:23
+#: .\core\templates\core\phongban_list.html:25
+#: .\core\templates\core\project_list.html:25
+#: .\core\templates\core\task_list.html:27
+#: .\core\templates\core\tepdinhkem_list.html:25
+#: .\core\templates\core\truongdulieu_list.html:27
+msgid "Xem"
+msgstr ""
+
+#: .\core\templates\core\coquan_list.html:32
+msgid "Thêm Cơ quan"
+msgstr ""
+
+#: .\core\templates\core\dashboard.html:4
+#: .\core\templates\core\dashboard.html:8 .\core\templates\core\home.html:11
+msgid "Bảng điều khiển"
+msgstr ""
+
+#: .\core\templates\core\dashboard.html:9
+msgid "Chào mừng"
+msgstr ""
+
+#: .\core\templates\core\dashboard.html:11
+msgid "Liên kết nhanh"
+msgstr ""
+
+#: .\core\templates\core\dashboard.html:13
+msgid "Xem tất cả Phòng Ban"
+msgstr ""
+
+#: .\core\templates\core\dashboard.html:14
+msgid "Quản lý Người dùng"
+msgstr ""
+
+#: .\core\templates\core\dashboard.html:16
+msgid "Xem tất cả Dự án"
+msgstr ""
+
+#: .\core\templates\core\dashboard.html:17
+#, fuzzy
+#| msgid "View All Loại Nhiệm Vụ"
+msgid "Xem tất cả Nhiệm vụ"
+msgstr "Xem tất cả Loại Nhiệm vụ"
+
+#: .\core\templates\core\dashboard.html:18
+#, fuzzy
+#| msgid "View All Gói Thầu"
+msgid "Xem tất cả Gói Thầu"
+msgstr "Xem tất cả Gói Thầu"
+
+#: .\core\templates\core\dashboard.html:19
+#, fuzzy
+#| msgid "View All Giải Ngân"
+msgid "Xem tất cả Giải Ngân"
+msgstr "Xem tất cả Giải Ngân"
+
+#: .\core\templates\core\dashboard.html:20
+#, fuzzy
+#| msgid "View All Loại Nhiệm Vụ"
+msgid "Xem tất cả Loại Nhiệm Vụ"
+msgstr "Xem tất cả Loại Nhiệm vụ"
+
+#: .\core\templates\core\dashboard.html:21
+#, fuzzy
+#| msgid "View All Trường Dữ Liệu"
+msgid "Xem tất cả Trường Dữ Liệu"
+msgstr "Xem tất cả Trường Dữ liệu"
+
+#: .\core\templates\core\dashboard.html:22
+#, fuzzy
+#| msgid "View All Tệp Đính Kèm"
+msgid "Xem tất cả Tệp Đính Kèm"
+msgstr "Xem tất cả Tệp Đính kèm"
+
+#: .\core\templates\core\dashboard.html:23
+#, fuzzy
+#| msgid "View All Lịch Sử Công Việc"
+msgid "Xem tất cả Lịch Sử Công Việc"
+msgstr "Xem tất cả Lịch sử Công việc"
+
+#: .\core\templates\core\dashboard.html:24
+#, fuzzy
+#| msgid "View All Giá Trị Trường Dữ Liệu"
+msgid "Xem tất cả Giá Trị Trường Dữ Liệu"
+msgstr "Xem tất cả Giá trị Trường Dữ liệu"
+
+#: .\core\templates\core\giaingan_confirm_delete.html:4
+#: .\core\templates\core\giaingan_detail.html:20
+#, fuzzy
+#| msgid "View All Giải Ngân"
+msgid "Xóa Giải Ngân"
+msgstr "Xem tất cả Giải Ngân"
+
+#: .\core\templates\core\giaingan_confirm_delete.html:8
+msgid "Xác nhận xóa Giải Ngân"
+msgstr ""
+
+#: .\core\templates\core\giaingan_confirm_delete.html:10
+msgid "Bạn có chắc chắn muốn xóa bản ghi Giải Ngân này không?"
+msgstr ""
+
+#: .\core\templates\core\giaingan_detail.html:10
+#: .\core\templates\core\giaingan_list.html:14
+msgid "Đợt Thanh Toán"
+msgstr ""
+
+#: .\core\templates\core\giaingan_detail.html:11
+#: .\core\templates\core\giaingan_list.html:15
+msgid "Số Tiền"
+msgstr ""
+
+#: .\core\templates\core\giaingan_detail.html:12
+msgid "Ngày Thanh Toán"
+msgstr ""
+
+#: .\core\templates\core\giaingan_detail.html:13
+msgid "Nội Dung"
+msgstr ""
+
+#: .\core\templates\core\giaingan_detail.html:14
+#: .\core\templates\core\giaingan_list.html:16
+#: .\core\templates\core\goithau_detail.html:16
+#: .\core\templates\core\goithau_list.html:15
+#: .\core\templates\core\project_list.html:4
+#: .\core\templates\core\task_detail.html:16
+#: .\core\templates\core\tepdinhkem_detail.html:16
+msgid "Dự án"
+msgstr ""
+
+#: .\core\templates\core\giaingan_detail.html:18
+msgid "← Quay lại Danh sách Giải Ngân"
+msgstr ""
+
+#: .\core\templates\core\giaingan_detail.html:19
+#, fuzzy
+#| msgid "View All Giải Ngân"
+msgid "Sửa Giải Ngân"
+msgstr "Xem tất cả Giải Ngân"
+
+#: .\core\templates\core\giaingan_form.html:4
+#: .\core\templates\core\giaingan_form.html:8
+#, fuzzy
+#| msgid "View All Giải Ngân"
+msgid "Biểu mẫu Giải Ngân"
+msgstr "Xem tất cả Giải Ngân"
+
+#: .\core\templates\core\giaingan_list.html:4
+#, fuzzy
+#| msgid "View All Giải Ngân"
+msgid "Giải Ngân"
+msgstr "Xem tất cả Giải Ngân"
+
+#: .\core\templates\core\giaingan_list.html:8
+#, fuzzy
+#| msgid "View All Giải Ngân"
+msgid "Danh sách Giải Ngân"
+msgstr "Xem tất cả Giải Ngân"
+
+#: .\core\templates\core\giaingan_list.html:36
+#, fuzzy
+#| msgid "View All Giải Ngân"
+msgid "Thêm Giải Ngân"
+msgstr "Xem tất cả Giải Ngân"
+
+#: .\core\templates\core\giatritruongdulieu_confirm_delete.html:4
+#: .\core\templates\core\giatritruongdulieu_detail.html:18
+#, fuzzy
+#| msgid "View All Giá Trị Trường Dữ Liệu"
+msgid "Xóa Giá Trị Trường Dữ Liệu"
+msgstr "Xem tất cả Giá trị Trường Dữ liệu"
+
+#: .\core\templates\core\giatritruongdulieu_confirm_delete.html:8
+#, fuzzy
+#| msgid "View All Giá Trị Trường Dữ Liệu"
+msgid "Xác nhận xóa Giá Trị Trường Dữ Liệu"
+msgstr "Xem tất cả Giá trị Trường Dữ liệu"
+
+#: .\core\templates\core\giatritruongdulieu_confirm_delete.html:10
+msgid "Bạn có chắc chắn muốn xóa bản ghi Giá Trị Trường Dữ Liệu này không?"
+msgstr ""
+
+#: .\core\templates\core\giatritruongdulieu_detail.html:4
+#: .\core\templates\core\giatritruongdulieu_detail.html:8
+#: .\core\templates\core\giatritruongdulieu_list.html:4
+#, fuzzy
+#| msgid "View All Giá Trị Trường Dữ Liệu"
+msgid "Giá Trị Trường Dữ Liệu"
+msgstr "Xem tất cả Giá trị Trường Dữ liệu"
+
+#: .\core\templates\core\giatritruongdulieu_detail.html:10
+#: .\core\templates\core\giatritruongdulieu_list.html:14
+msgid "Giá Trị"
+msgstr ""
+
+#: .\core\templates\core\giatritruongdulieu_detail.html:11
+#: .\core\templates\core\giatritruongdulieu_list.html:15
+#: .\core\templates\core\lichsucongviec_detail.html:13
+#: .\core\templates\core\lichsucongviec_list.html:17
+#: .\core\templates\core\tepdinhkem_detail.html:13
+msgid "Công Việc"
+msgstr ""
+
+#: .\core\templates\core\giatritruongdulieu_detail.html:12
+#: .\core\templates\core\giatritruongdulieu_list.html:16
+#: .\core\templates\core\truongdulieu_list.html:4
+#, fuzzy
+#| msgid "View All Trường Dữ Liệu"
+msgid "Trường Dữ Liệu"
+msgstr "Xem tất cả Trường Dữ liệu"
+
+#: .\core\templates\core\giatritruongdulieu_detail.html:16
+#, fuzzy
+#| msgid "View All Giá Trị Trường Dữ Liệu"
+msgid "← Quay lại Danh sách Giá Trị Trường Dữ Liệu"
+msgstr "Xem tất cả Giá trị Trường Dữ liệu"
+
+#: .\core\templates\core\giatritruongdulieu_detail.html:17
+#, fuzzy
+#| msgid "View All Giá Trị Trường Dữ Liệu"
+msgid "Sửa Giá Trị Trường Dữ Liệu"
+msgstr "Xem tất cả Giá trị Trường Dữ liệu"
+
+#: .\core\templates\core\giatritruongdulieu_form.html:4
+#: .\core\templates\core\giatritruongdulieu_form.html:8
+#, fuzzy
+#| msgid "View All Giá Trị Trường Dữ Liệu"
+msgid "Biểu mẫu Giá Trị Trường Dữ Liệu"
+msgstr "Xem tất cả Giá trị Trường Dữ liệu"
+
+#: .\core\templates\core\giatritruongdulieu_list.html:8
+#, fuzzy
+#| msgid "View All Giá Trị Trường Dữ Liệu"
+msgid "Danh sách Giá Trị Trường Dữ Liệu"
+msgstr "Xem tất cả Giá trị Trường Dữ liệu"
+
+#: .\core\templates\core\giatritruongdulieu_list.html:36
+#, fuzzy
+#| msgid "View All Giá Trị Trường Dữ Liệu"
+msgid "Thêm Giá Trị Trường Dữ Liệu"
+msgstr "Xem tất cả Giá trị Trường Dữ liệu"
+
+#: .\core\templates\core\goithau_confirm_delete.html:4
+#: .\core\templates\core\goithau_detail.html:22
+#, fuzzy
+#| msgid "View All Gói Thầu"
+msgid "Xóa Gói Thầu"
+msgstr "Xem tất cả Gói Thầu"
+
+#: .\core\templates\core\goithau_confirm_delete.html:8
+msgid "Xác nhận xóa Gói Thầu"
+msgstr ""
+
+#: .\core\templates\core\goithau_detail.html:10
+#: .\core\templates\core\goithau_list.html:14
+#, fuzzy
+#| msgid "View All Gói Thầu"
+msgid "Tên Gói Thầu"
+msgstr "Xem tất cả Gói Thầu"
+
+#: .\core\templates\core\goithau_detail.html:11
+#, fuzzy
+#| msgid "View All Gói Thầu"
+msgid "Giá Gói Thầu"
+msgstr "Xem tất cả Gói Thầu"
+
+#: .\core\templates\core\goithau_detail.html:12
+msgid "Hình Thức Lựa Chọn"
+msgstr ""
+
+#: .\core\templates\core\goithau_detail.html:13
+msgid "Nhà Thầu Trúng Thầu"
+msgstr ""
+
+#: .\core\templates\core\goithau_detail.html:14
+msgid "Ngày Mở Thầu"
+msgstr ""
+
+#: .\core\templates\core\goithau_detail.html:15
+msgid "Ngày Phê Duyệt Kết Quả"
+msgstr ""
+
+#: .\core\templates\core\goithau_detail.html:20
+msgid "← Quay lại Danh sách Gói Thầu"
+msgstr ""
+
+#: .\core\templates\core\goithau_detail.html:21
+#, fuzzy
+#| msgid "View All Gói Thầu"
+msgid "Sửa Gói Thầu"
+msgstr "Xem tất cả Gói Thầu"
+
+#: .\core\templates\core\goithau_form.html:4
+#: .\core\templates\core\goithau_form.html:8
+#, fuzzy
+#| msgid "View All Gói Thầu"
+msgid "Biểu mẫu Gói Thầu"
+msgstr "Xem tất cả Gói Thầu"
+
+#: .\core\templates\core\goithau_list.html:4
+#: .\core\templates\core\tepdinhkem_detail.html:19
+#, fuzzy
+#| msgid "View All Gói Thầu"
+msgid "Gói Thầu"
+msgstr "Xem tất cả Gói Thầu"
+
+#: .\core\templates\core\goithau_list.html:8
+#, fuzzy
+#| msgid "View All Gói Thầu"
+msgid "Danh sách Gói Thầu"
+msgstr "Xem tất cả Gói Thầu"
+
+#: .\core\templates\core\goithau_list.html:34
+#, fuzzy
+#| msgid "View All Gói Thầu"
+msgid "Thêm Gói Thầu"
+msgstr "Xem tất cả Gói Thầu"
+
+#: .\core\templates\core\home.html:4
+msgid "Trang chủ"
+msgstr ""
+
+#: .\core\templates\core\home.html:8
+msgid "Chào mừng đến với qg_vanphong!"
+msgstr ""
+
+#: .\core\templates\core\home.html:9
+msgid "Đây là trang chủ."
+msgstr ""
+
+#: .\core\templates\core\home.html:11
+msgid "Bạn đã đăng nhập với tên"
+msgstr ""
+
+#: .\core\templates\core\home.html:11
+msgid "Đi đến"
+msgstr ""
+
+#: .\core\templates\core\home.html:13
+msgid "Vui lòng"
+msgstr ""
+
+#: .\core\templates\core\home.html:13
+msgid "Đăng nhập"
+msgstr ""
+
+#: .\core\templates\core\home.html:13
+msgid "để tiếp tục."
+msgstr ""
+
+#: .\core\templates\core\lichsucongviec_confirm_delete.html:4
+#: .\core\templates\core\lichsucongviec_detail.html:19
+#, fuzzy
+#| msgid "View All Lịch Sử Công Việc"
+msgid "Xóa Lịch Sử Công Việc"
+msgstr "Xem tất cả Lịch sử Công việc"
+
+#: .\core\templates\core\lichsucongviec_confirm_delete.html:8
+#, fuzzy
+#| msgid "View All Lịch Sử Công Việc"
+msgid "Xác nhận xóa Lịch Sử Công Việc"
+msgstr "Xem tất cả Lịch sử Công việc"
+
+#: .\core\templates\core\lichsucongviec_confirm_delete.html:10
+msgid "Bạn có chắc chắn muốn xóa bản ghi Lịch Sử Công Việc này không?"
+msgstr ""
+
+#: .\core\templates\core\lichsucongviec_detail.html:4
+#: .\core\templates\core\lichsucongviec_detail.html:8
+#: .\core\templates\core\lichsucongviec_list.html:4
+#, fuzzy
+#| msgid "View All Lịch Sử Công Việc"
+msgid "Lịch Sử Công Việc"
+msgstr "Xem tất cả Lịch sử Công việc"
+
+#: .\core\templates\core\lichsucongviec_detail.html:10
+#: .\core\templates\core\lichsucongviec_list.html:14
+msgid "Hành Động"
+msgstr ""
+
+#: .\core\templates\core\lichsucongviec_detail.html:11
+#: .\core\templates\core\lichsucongviec_list.html:15
+msgid "Thời Gian"
+msgstr ""
+
+#: .\core\templates\core\lichsucongviec_detail.html:12
+#: .\core\templates\core\lichsucongviec_list.html:16
+msgid "Người Thực Hiện"
+msgstr ""
+
+#: .\core\templates\core\lichsucongviec_detail.html:17
+#, fuzzy
+#| msgid "View All Lịch Sử Công Việc"
+msgid "← Quay lại Danh sách Lịch Sử Công Việc"
+msgstr "Xem tất cả Lịch sử Công việc"
+
+#: .\core\templates\core\lichsucongviec_detail.html:18
+#, fuzzy
+#| msgid "View All Lịch Sử Công Việc"
+msgid "Sửa Lịch Sử Công Việc"
+msgstr "Xem tất cả Lịch sử Công việc"
+
+#: .\core\templates\core\lichsucongviec_form.html:4
+#: .\core\templates\core\lichsucongviec_form.html:8
+#, fuzzy
+#| msgid "View All Lịch Sử Công Việc"
+msgid "Biểu mẫu Lịch Sử Công Việc"
+msgstr "Xem tất cả Lịch sử Công việc"
+
+#: .\core\templates\core\lichsucongviec_list.html:8
+#, fuzzy
+#| msgid "View All Lịch Sử Công Việc"
+msgid "Danh sách Lịch Sử Công Việc"
+msgstr "Xem tất cả Lịch sử Công việc"
+
+#: .\core\templates\core\lichsucongviec_list.html:38
+#, fuzzy
+#| msgid "View All Lịch Sử Công Việc"
+msgid "Thêm Lịch Sử Công Việc"
+msgstr "Xem tất cả Lịch sử Công việc"
+
+#: .\core\templates\core\loainhiemvu_confirm_delete.html:4
+#: .\core\templates\core\loainhiemvu_detail.html:16
+#, fuzzy
+#| msgid "View All Loại Nhiệm Vụ"
+msgid "Xóa Loại Nhiệm Vụ"
+msgstr "Xem tất cả Loại Nhiệm vụ"
+
+#: .\core\templates\core\loainhiemvu_confirm_delete.html:8
+#, fuzzy
+#| msgid "View All Loại Nhiệm Vụ"
+msgid "Xác nhận xóa Loại Nhiệm Vụ"
+msgstr "Xem tất cả Loại Nhiệm vụ"
+
+#: .\core\templates\core\loainhiemvu_detail.html:10
+#: .\core\templates\core\loainhiemvu_list.html:14
+#, fuzzy
+#| msgid "View All Loại Nhiệm Vụ"
+msgid "Tên Loại Nhiệm Vụ"
+msgstr "Xem tất cả Loại Nhiệm vụ"
+
+#: .\core\templates\core\loainhiemvu_detail.html:14
+#, fuzzy
+#| msgid "View All Loại Nhiệm Vụ"
+msgid "← Quay lại Danh sách Loại Nhiệm Vụ"
+msgstr "Xem tất cả Loại Nhiệm vụ"
+
+#: .\core\templates\core\loainhiemvu_detail.html:15
+#, fuzzy
+#| msgid "View All Loại Nhiệm Vụ"
+msgid "Sửa Loại Nhiệm Vụ"
+msgstr "Xem tất cả Loại Nhiệm vụ"
+
+#: .\core\templates\core\loainhiemvu_form.html:4
+#: .\core\templates\core\loainhiemvu_form.html:8
+#, fuzzy
+#| msgid "View All Loại Nhiệm Vụ"
+msgid "Biểu mẫu Loại Nhiệm Vụ"
+msgstr "Xem tất cả Loại Nhiệm vụ"
+
+#: .\core\templates\core\loainhiemvu_list.html:4
+#: .\core\templates\core\truongdulieu_detail.html:13
+#: .\core\templates\core\truongdulieu_list.html:16
+#, fuzzy
+#| msgid "View All Loại Nhiệm Vụ"
+msgid "Loại Nhiệm Vụ"
+msgstr "Xem tất cả Loại Nhiệm vụ"
+
+#: .\core\templates\core\loainhiemvu_list.html:8
+#, fuzzy
+#| msgid "View All Loại Nhiệm Vụ"
+msgid "Danh sách Loại Nhiệm Vụ"
+msgstr "Xem tất cả Loại Nhiệm vụ"
+
+#: .\core\templates\core\loainhiemvu_list.html:32
+#, fuzzy
+#| msgid "View All Loại Nhiệm Vụ"
+msgid "Thêm Loại Nhiệm Vụ"
+msgstr "Xem tất cả Loại Nhiệm vụ"
+
+#: .\core\templates\core\phongban_confirm_delete.html:4
+#: .\core\templates\core\phongban_detail.html:16
+#, fuzzy
+#| msgid "View All Phòng Ban"
+msgid "Xóa Phòng Ban"
+msgstr "Xem tất cả Phòng Ban"
+
+#: .\core\templates\core\phongban_confirm_delete.html:8
+msgid "Xác nhận xóa Phòng Ban"
+msgstr ""
+
+#: .\core\templates\core\phongban_detail.html:9
+#: .\core\templates\core\phongban_list.html:14
+#, fuzzy
+#| msgid "View All Phòng Ban"
+msgid "Tên Phòng Ban"
+msgstr "Xem tất cả Phòng Ban"
+
+#: .\core\templates\core\phongban_detail.html:14
+msgid "← Quay lại Danh sách Phòng Ban"
+msgstr ""
+
+#: .\core\templates\core\phongban_detail.html:15
+#, fuzzy
+#| msgid "View All Phòng Ban"
+msgid "Sửa Phòng Ban"
+msgstr "Xem tất cả Phòng Ban"
+
+#: .\core\templates\core\phongban_form.html:4
+#: .\core\templates\core\phongban_form.html:8
+#, fuzzy
+#| msgid "View All Phòng Ban"
+msgid "Biểu mẫu Phòng Ban"
+msgstr "Xem tất cả Phòng Ban"
+
+#: .\core\templates\core\phongban_list.html:4
+#, fuzzy
+#| msgid "View All Phòng Ban"
+msgid "Phòng Ban"
+msgstr "Xem tất cả Phòng Ban"
+
+#: .\core\templates\core\phongban_list.html:8
+#, fuzzy
+#| msgid "View All Phòng Ban"
+msgid "Danh sách Phòng Ban"
+msgstr "Xem tất cả Phòng Ban"
+
+#: .\core\templates\core\phongban_list.html:34
+#, fuzzy
+#| msgid "View All Phòng Ban"
+msgid "Thêm Phòng Ban"
+msgstr "Xem tất cả Phòng Ban"
+
+#: .\core\templates\core\project_confirm_delete.html:4
+#: .\core\templates\core\project_detail.html:21
+msgid "Xóa Dự án"
+msgstr ""
+
+#: .\core\templates\core\project_confirm_delete.html:8
+msgid "Xác nhận xóa Dự án"
+msgstr ""
+
+#: .\core\templates\core\project_detail.html:10
+#: .\core\templates\core\task_detail.html:10
+msgid "Mô tả"
+msgstr ""
+
+#: .\core\templates\core\project_detail.html:11
+#: .\core\templates\core\project_list.html:15
+#: .\core\templates\core\task_detail.html:11
+#: .\core\templates\core\task_list.html:15
+msgid "Trạng thái"
+msgstr ""
+
+#: .\core\templates\core\project_detail.html:12
+msgid "Ngày bắt đầu"
+msgstr ""
+
+#: .\core\templates\core\project_detail.html:13
+msgid "Ngày kết thúc"
+msgstr ""
+
+#: .\core\templates\core\project_detail.html:14
+msgid "Chủ đầu tư"
+msgstr ""
+
+#: .\core\templates\core\project_detail.html:15
+msgid "Tổng mức đầu tư"
+msgstr ""
+
+#: .\core\templates\core\project_detail.html:19
+msgid "← Quay lại Danh sách Dự án"
+msgstr ""
+
+#: .\core\templates\core\project_detail.html:20
+msgid "Sửa Dự án"
+msgstr ""
+
+#: .\core\templates\core\project_form.html:4
+#: .\core\templates\core\project_form.html:8
+msgid "Biểu mẫu Dự án"
+msgstr ""
+
+#: .\core\templates\core\project_form.html:28
+msgid "Lưu Dự án"
+msgstr ""
+
+#: .\core\templates\core\project_list.html:8
+msgid "Danh sách Dự án"
+msgstr ""
+
+#: .\core\templates\core\project_list.html:14
+msgid "Tên Dự án"
+msgstr ""
+
+#: .\core\templates\core\project_list.html:34
+msgid "Thêm Dự án"
+msgstr ""
+
+#: .\core\templates\core\task_confirm_delete.html:4
+#: .\core\templates\core\task_detail.html:23
+msgid "Xóa Nhiệm vụ"
+msgstr ""
+
+#: .\core\templates\core\task_confirm_delete.html:8
+msgid "Xác nhận xóa Nhiệm vụ"
+msgstr ""
+
+#: .\core\templates\core\task_detail.html:12
+#: .\core\templates\core\task_list.html:16
+msgid "Ngày đến hạn"
+msgstr ""
+
+#: .\core\templates\core\task_detail.html:13
+msgid "Người giao việc"
+msgstr ""
+
+#: .\core\templates\core\task_detail.html:14
+msgid "Người xử lý chính"
+msgstr ""
+
+#: .\core\templates\core\task_detail.html:21
+msgid "← Quay lại Danh sách Nhiệm vụ"
+msgstr ""
+
+#: .\core\templates\core\task_detail.html:22
+msgid "Sửa Nhiệm vụ"
+msgstr ""
+
+#: .\core\templates\core\task_form.html:4
+#: .\core\templates\core\task_form.html:8
+#, fuzzy
+#| msgid "View All Loại Nhiệm Vụ"
+msgid "Biểu mẫu Nhiệm vụ"
+msgstr "Xem tất cả Loại Nhiệm vụ"
+
+#: .\core\templates\core\task_form.html:28
+msgid "Lưu Nhiệm vụ"
+msgstr ""
+
+#: .\core\templates\core\task_list.html:4
+msgid "Nhiệm vụ"
+msgstr ""
+
+#: .\core\templates\core\task_list.html:8
+msgid "Danh sách Nhiệm vụ"
+msgstr ""
+
+#: .\core\templates\core\task_list.html:14
+msgid "Tiêu đề"
+msgstr ""
+
+#: .\core\templates\core\task_list.html:36
+msgid "Thêm Nhiệm vụ"
+msgstr ""
+
+#: .\core\templates\core\tepdinhkem_confirm_delete.html:4
+#: .\core\templates\core\tepdinhkem_detail.html:26
+#, fuzzy
+#| msgid "View All Tệp Đính Kèm"
+msgid "Xóa Tệp Đính Kèm"
+msgstr "Xem tất cả Tệp Đính kèm"
+
+#: .\core\templates\core\tepdinhkem_confirm_delete.html:8
+#, fuzzy
+#| msgid "View All Tệp Đính Kèm"
+msgid "Xác nhận xóa Tệp Đính Kèm"
+msgstr "Xem tất cả Tệp Đính kèm"
+
+#: .\core\templates\core\tepdinhkem_confirm_delete.html:10
+msgid "Bạn có chắc chắn muốn xóa Tệp Đính Kèm này không?"
+msgstr ""
+
+#: .\core\templates\core\tepdinhkem_detail.html:4
+#: .\core\templates\core\tepdinhkem_detail.html:8
+#: .\core\templates\core\tepdinhkem_list.html:4
+#, fuzzy
+#| msgid "View All Tệp Đính Kèm"
+msgid "Tệp Đính Kèm"
+msgstr "Xem tất cả Tệp Đính kèm"
+
+#: .\core\templates\core\tepdinhkem_detail.html:10
+#: .\core\templates\core\tepdinhkem_list.html:14
+msgid "Tệp"
+msgstr ""
+
+#: .\core\templates\core\tepdinhkem_detail.html:11
+#: .\core\templates\core\tepdinhkem_list.html:15
+msgid "Người Tải Lên"
+msgstr ""
+
+#: .\core\templates\core\tepdinhkem_detail.html:24
+msgid "← Quay lại Danh sách Tệp Đính Kèm"
+msgstr ""
+
+#: .\core\templates\core\tepdinhkem_detail.html:25
+#, fuzzy
+#| msgid "View All Tệp Đính Kèm"
+msgid "Sửa Tệp Đính Kèm"
+msgstr "Xem tất cả Tệp Đính kèm"
+
+#: .\core\templates\core\tepdinhkem_form.html:4
+#: .\core\templates\core\tepdinhkem_form.html:8
+#, fuzzy
+#| msgid "View All Tệp Đính Kèm"
+msgid "Biểu mẫu Tệp Đính Kèm"
+msgstr "Xem tất cả Tệp Đính kèm"
+
+#: .\core\templates\core\tepdinhkem_list.html:8
+#, fuzzy
+#| msgid "View All Tệp Đính Kèm"
+msgid "Danh sách Tệp Đính Kèm"
+msgstr "Xem tất cả Tệp Đính kèm"
+
+#: .\core\templates\core\tepdinhkem_list.html:34
+#, fuzzy
+#| msgid "View All Tệp Đính Kèm"
+msgid "Thêm Tệp Đính Kèm"
+msgstr "Xem tất cả Tệp Đính kèm"
+
+#: .\core\templates\core\truongdulieu_confirm_delete.html:4
+#: .\core\templates\core\truongdulieu_detail.html:19
+#, fuzzy
+#| msgid "View All Trường Dữ Liệu"
+msgid "Xóa Trường Dữ Liệu"
+msgstr "Xem tất cả Trường Dữ liệu"
+
+#: .\core\templates\core\truongdulieu_confirm_delete.html:8
+#, fuzzy
+#| msgid "View All Trường Dữ Liệu"
+msgid "Xác nhận xóa Trường Dữ Liệu"
+msgstr "Xem tất cả Trường Dữ liệu"
+
+#: .\core\templates\core\truongdulieu_detail.html:10
+#: .\core\templates\core\truongdulieu_list.html:14
+msgid "Tên Trường"
+msgstr ""
+
+#: .\core\templates\core\truongdulieu_detail.html:11
+#: .\core\templates\core\truongdulieu_list.html:15
+msgid "Loại Trường"
+msgstr ""
+
+#: .\core\templates\core\truongdulieu_detail.html:12
+msgid "Bắt Buộc"
+msgstr ""
+
+#: .\core\templates\core\truongdulieu_detail.html:17
+#, fuzzy
+#| msgid "View All Trường Dữ Liệu"
+msgid "← Quay lại Danh sách Trường Dữ Liệu"
+msgstr "Xem tất cả Trường Dữ liệu"
+
+#: .\core\templates\core\truongdulieu_detail.html:18
+#, fuzzy
+#| msgid "View All Trường Dữ Liệu"
+msgid "Sửa Trường Dữ Liệu"
+msgstr "Xem tất cả Trường Dữ liệu"
+
+#: .\core\templates\core\truongdulieu_form.html:4
+#: .\core\templates\core\truongdulieu_form.html:8
+#, fuzzy
+#| msgid "View All Trường Dữ Liệu"
+msgid "Biểu mẫu Trường Dữ Liệu"
+msgstr "Xem tất cả Trường Dữ liệu"
+
+#: .\core\templates\core\truongdulieu_list.html:8
+#, fuzzy
+#| msgid "View All Trường Dữ Liệu"
+msgid "Danh sách Trường Dữ Liệu"
+msgstr "Xem tất cả Trường Dữ liệu"
+
+#: .\core\templates\core\truongdulieu_list.html:36
+#, fuzzy
+#| msgid "View All Trường Dữ Liệu"
+msgid "Thêm Trường Dữ Liệu"
+msgstr "Xem tất cả Trường Dữ liệu"
+
+#~ msgid "Close"
+#~ msgstr "Đóng"
+
+#~ msgid "Dashboard"
+#~ msgstr "Bảng điều khiển"
+
+#~ msgid "Welcome"
+#~ msgstr "Chào mừng"
+
+#~ msgid "Quick Links"
+#~ msgstr "Liên kết nhanh"
+
+#~ msgid "View All Projects"
+#~ msgstr "Xem tất cả Dự án"
+
+#~ msgid "View All Tasks"
+#~ msgstr "Xem tất cả Nhiệm vụ"
+
+#~ msgid "Manage Users"
+#~ msgstr "Quản lý Người dùng"

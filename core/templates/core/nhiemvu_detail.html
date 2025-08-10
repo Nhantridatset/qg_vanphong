@@ -1,0 +1,173 @@
+{% extends 'core/base.html' %}
+{% load custom_filters %}
+{% load custom_filters %}
+{% load custom_filters %}
+
+{% block title %}Chi tiết Nhiệm vụ{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- Main Task Details -->
+    <div class="lg:col-span-2 bg-white p-8 rounded-xl shadow-md">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-800">{{ object.ten_nhiem_vu }}</h1>
+                <p class="text-sm text-slate-500">Trong kế hoạch: <a href="{% url 'kehoach-detail' object.id_ke_hoach.pk %}" class="text-indigo-600 hover:underline">{{ object.id_ke_hoach.ten_ke_hoach }}</a></p>
+            </div>
+            <span class="text-sm font-semibold px-3 py-1 rounded-full 
+                {% if object.trang_thai == 'HOAN_THANH' %} bg-green-100 text-green-800 
+                {% elif object.trang_thai == 'DA_DUYET' %} bg-indigo-100 text-indigo-800
+                {% elif object.trang_thai == 'BI_TRE' %} bg-red-100 text-red-800
+                {% else %} bg-blue-100 text-blue-800 {% endif %}">
+                {{ object.get_trang_thai_display }}
+            </span>
+        </div>
+
+        <div class="mt-6 border-t border-slate-200 pt-6">
+            <h2 class="text-lg font-semibold text-slate-700 mb-2">Mô tả chi tiết</h2>
+            <p class="text-slate-600">{{ object.mo_ta|linebreaks }}</p>
+        </div>
+
+        <div class="mt-6 border-t border-slate-200 pt-6">
+            <h2 class="text-lg font-semibold text-slate-700 mb-2">Thông tin thời gian</h2>
+            <p class="text-slate-600"><strong>Thời gian ước tính:</strong> {{ object.thoi_gian_uoc_tinh|default:"N/A" }} giờ</p>
+            <p class="text-slate-600"><strong>Thời gian thực tế:</strong> {{ object.thoi_gian_thuc_te|default:"N/A" }} giờ</p>
+        </div>
+
+        {% if object.is_recurring %}
+        <div class="mt-6 border-t border-slate-200 pt-6">
+            <h2 class="text-lg font-semibold text-slate-700 mb-2">Thông tin lặp lại</h2>
+            <p class="text-slate-600"><strong>Tần suất:</strong> {{ object.get_recurring_frequency_display }}</p>
+            <p class="text-slate-600"><strong>Lặp lại đến:</strong> {{ object.recurring_until|date:"d/m/Y H:i"|default:"Vô thời hạn" }}</p>
+        </div>
+        {% endif %}
+
+        {% if object.danh_gia_sao %}
+        <div class="mt-6 border-t border-slate-200 pt-6">
+            <h2 class="text-lg font-semibold text-slate-700 mb-2">Đánh giá</h2>
+                                    <p class="text-slate-600"><strong>Số sao:</strong> {{ object.danh_gia_sao }} <span class="text-yellow-500">{{ "★"|repeat_string:object.danh_gia_sao }}</span></p>
+            <p class="text-slate-600"><strong>Lời đánh giá:</strong> {{ object.loi_danh_gia|default:"Không có" }}</p>
+        </div>
+        {% endif %}
+
+        <div class="mt-8 flex items-center justify-start space-x-4">
+            {% if can_approve_task %}
+                <a href="{% url 'approve-nhiemvu' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition-colors">Duyệt Nhiệm vụ</a>
+            {% endif %}
+
+            {% if request.user.is_authenticated and object.id_nguoi_thuc_hien == request.user and object.trang_thai != 'HOAN_THANH' %}
+                <button id="completeAndRateBtn" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors">Hoàn thành & Đánh giá</button>
+            {% endif %}
+
+            <a href="{% url 'nhiemvu-update' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">Sửa</a>
+            <a href="{% url 'nhiemvu-delete' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors">Xóa</a>
+            <a href="{% url 'nhiemvu-list' %}" class="px-4 py-2 rounded-md text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors">Quay lại</a>
+        </div>
+    </div>
+
+    <!-- Sidebar for Comments and History -->
+    <div class="space-y-8">
+        <div class="bg-white p-6 rounded-xl shadow-md">
+            <h2 class="text-xl font-semibold mb-4 text-slate-700">Thảo luận</h2>
+            <!-- New Comment Form -->
+            <form method="post" class="mb-6">
+                {% csrf_token %}
+                <div class="mb-2">
+                    {{ form.noi_dung }}
+                </div>
+                <button type="submit" class="w-full px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">Gửi bình luận</button>
+            </form>
+
+            <!-- Comments List -->
+            <div class="space-y-5">
+                {% for comment in binh_luan %}
+                    <div class="flex space-x-3">
+                        <div class="flex-shrink-0">
+                            <div class="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-500">
+                                {{ comment.user.username|first|upper }}
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="bg-slate-50 rounded-lg px-4 py-2">
+                                <p class="text-sm font-medium text-slate-900">{{ comment.user.username }}</p>
+                                <p class="text-slate-600">{{ comment.noi_dung }}</p>
+                            </div>
+                            <div class="mt-1 text-xs text-slate-400">
+                                <span>{{ comment.timestamp|date:"d/m/Y H:i" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-sm text-slate-500 text-center py-4">Chưa có bình luận nào.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rating Modal -->
+<div id="ratingModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Đánh giá Nhiệm vụ</h3>
+        <form method="post" action="{% url 'complete-and-rate-nhiemvu' object.pk %}">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label for="danh_gia_sao" class="block text-sm font-medium text-gray-700">Số sao:</label>
+                <select id="danh_gia_sao" name="danh_gia_sao" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <option value="">Chọn số sao</option>
+                    <option value="1">1 Sao</option>
+                    <option value="2">2 Sao</option>
+                    <option value="3">3 Sao</option>
+                    <option value="4">4 Sao</option>
+                    <option value="5">5 Sao</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="loi_danh_gia" class="block text-sm font-medium text-gray-700">Lời đánh giá (Không bắt buộc):</label>
+                <textarea id="loi_danh_gia" name="loi_danh_gia" rows="3" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"></textarea>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button type="button" id="cancelRatingBtn" class="px-4 py-2 rounded-md text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors">Hủy</button>
+                <button type="submit" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">Gửi đánh giá</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Simple script to add Tailwind classes to the comment form
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const textarea = form.querySelector('textarea');
+    if (textarea) {
+        textarea.classList.add('block', 'w-full', 'px-3', 'py-2', 'border', 'border-slate-300', 'rounded-md', 'shadow-sm', 'focus:outline-none', 'focus:ring-indigo-500', 'focus:border-indigo-500', 'sm:text-sm');
+        textarea.setAttribute('rows', '3');
+        textarea.setAttribute('placeholder', 'Nhập bình luận của bạn...');
+    }
+
+    // Rating Modal Logic
+    const completeAndRateBtn = document.getElementById('completeAndRateBtn');
+    const ratingModal = document.getElementById('ratingModal');
+    const cancelRatingBtn = document.getElementById('cancelRatingBtn');
+
+    if (completeAndRateBtn) {
+        completeAndRateBtn.addEventListener('click', () => {
+            ratingModal.classList.remove('hidden');
+        });
+    }
+
+    if (cancelRatingBtn) {
+        cancelRatingBtn.addEventListener('click', () => {
+            ratingModal.classList.add('hidden');
+        });
+    }
+
+    ratingModal.addEventListener('click', (e) => {
+        if (e.target === ratingModal) {
+            ratingModal.classList.add('hidden');
+        }
+    });
+});
+</script>
+{% endblock %}

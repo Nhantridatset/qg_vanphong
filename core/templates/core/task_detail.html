@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{{ task.title }}{% endblock %}
+
+{% block content %}
+    <div class="form-container">
+        <h1 class="form-title">{{ task.title }}</h1>
+        <div class="bg-white shadow-md rounded-lg p-8 mb-6">
+            <p class="mb-4"><strong class="font-semibold">{% trans "Mô tả" %}:</strong> {{ task.description }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Trạng thái" %}:</strong> {{ task.status }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Ngày đến hạn" %}:</strong> {{ task.due_date }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Người giao việc" %}:</strong> {{ task.nguoi_giao_viec.username }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Người xử lý chính" %}:</strong> {{ task.nguoi_xu_ly_chinh.username }}</p>
+            {% if task.du_an %}
+                <p class="mb-4"><strong class="font-semibold">{% trans "Dự án" %}:</strong> <a href="{% url 'project_detail' task.du_an.pk %}" class="text-primary hover:underline">{{ task.du_an.name }}</a></p>
+            {% endif %}
+        </div>
+
+        <div class="flex space-x-4 mt-6">
+            <a href="{% url 'task_list' %}" class="form-button bg-gray-500 hover:bg-gray-700">{% trans "← Quay lại Danh sách Nhiệm vụ" %}</a>
+            <a href="{% url 'task_update' task.pk %}" class="form-button bg-yellow-500 hover:bg-yellow-700">{% trans "Sửa Nhiệm vụ" %}</a>
+            <a href="{% url 'task_delete' task.pk %}" class="form-button bg-red-500 hover:bg-red-700">{% trans "Xóa Nhiệm vụ" %}</a>
+            <button id="aiSuggestButton" class="form-button bg-blue-500 hover:bg-blue-700">{% trans "Gợi ý Dự thảo AI" %}</button>
+        </div>
+    </div>
+
+<script>
+    document.getElementById('aiSuggestButton').addEventListener('click', async () => {
+        const taskId = {{ task.pk }};
+        const response = await fetch(`/ai-suggest/${taskId}/`);
+        const data = await response.json();
+        // Call the global function defined in base.html
+        if (typeof openAiSuggestionModal === 'function') {
+            openAiSuggestionModal(data.suggestion);
+        } else {
+            console.error('openAiSuggestionModal function not found.');
+            document.getElementById('aiSuggestionContent').value = data.suggestion;
+            document.getElementById('aiSuggestionModal').classList.remove('hidden');
+        }
+    });
+</script>
+{% endblock %}

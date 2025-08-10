@@ -1,0 +1,39 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Nhiệm vụ" %}{% endblock %}
+
+{% block content %}
+    <div class="form-container">
+        <h1 class="form-title">{% trans "Danh sách Nhiệm vụ" %}</h1>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white rounded-lg shadow overflow-hidden">
+                <thead class="bg-gray-200 text-text">
+                    <tr>
+                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider">{% trans "Tiêu đề" %}</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider">{% trans "Trạng thái" %}</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider">{% trans "Ngày đến hạn" %}</th>
+                        <th class="py-3 px-4"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for task in tasks %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-3 px-4 whitespace-nowrap">{{ task.title }}</td>
+                            <td class="py-3 px-4 whitespace-nowrap">{{ task.status }}</td>
+                            <td class="py-3 px-4 whitespace-nowrap">{{ task.due_date }}</td>
+                            <td class="py-3 px-4 text-right whitespace-nowrap">
+                                <a href="{% url 'task_detail' task.pk %}" class="form-button bg-primary hover:bg-indigo-700 inline-block w-auto">{% trans "Xem" %}</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-6 text-center">
+            <a href="{% url 'task_create' %}" class="form-button bg-green-500 hover:bg-green-700 inline-block w-auto">{% trans "Thêm Nhiệm vụ" %}</a>
+        </div>
+    </div>
+{% endblock %}

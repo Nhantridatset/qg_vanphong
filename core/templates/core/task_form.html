@@ -1,0 +1,32 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Biểu mẫu Nhiệm vụ" %}{% endblock %}
+
+{% block content %}
+    <div class="form-container">
+        <h1 class="form-title">{% trans "Biểu mẫu Nhiệm vụ" %}</h1>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <p class="text-gray-600 text-xs italic mt-1">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% if field.errors %}
+                        <ul class="text-red-500 text-xs mt-1">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <div class="text-center mt-6">
+                <button type="submit" class="form-button">{% trans "Lưu Nhiệm vụ" %}</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

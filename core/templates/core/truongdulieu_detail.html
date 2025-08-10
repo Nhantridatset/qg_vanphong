@@ -1,0 +1,22 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{{ truongdulieu.field_name }}{% endblock %}
+
+{% block content %}
+    <div class="form-container">
+        <h1 class="form-title">{{ truongdulieu.field_name }}</h1>
+        <div class="bg-white shadow-md rounded-lg p-8 mb-6">
+            <p class="mb-4"><strong class="font-semibold">{% trans "Tên Trường" %}:</strong> {{ truongdulieu.field_name }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Loại Trường" %}:</strong> {{ truongdulieu.field_type }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Bắt Buộc" %}:</strong> {{ truongdulieu.is_required }}</p>
+            <p class="mb-4"><strong class="font-semibold">{% trans "Loại Nhiệm Vụ" %}:</strong> <a href="{% url 'loainhiemvu_detail' truongdulieu.loai_nhiem_vu.pk %}" class="text-primary hover:underline">{{ truongdulieu.loai_nhiem_vu.name }}</a></p>
+        </div>
+
+        <div class="flex space-x-4 mt-6">
+            <a href="{% url 'truongdulieu_list' %}" class="form-button bg-gray-500 hover:bg-gray-700">{% trans "← Quay lại Danh sách Trường Dữ Liệu" %}</a>
+            <a href="{% url 'truongdulieu_update' truongdulieu.pk %}" class="form-button bg-yellow-500 hover:bg-yellow-700">{% trans "Sửa Trường Dữ Liệu" %}</a>
+            <a href="{% url 'truongdulieu_delete' truongdulieu.pk %}" class="form-button bg-red-500 hover:bg-red-700">{% trans "Xóa Trường Dữ Liệu" %}</a>
+        </div>
+    </div>
+{% endblock %}

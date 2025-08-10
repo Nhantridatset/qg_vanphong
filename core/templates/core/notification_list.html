@@ -1,0 +1,31 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Thông báo của bạn{% endblock %}
+
+{% block content %}
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-slate-800">Thông báo của bạn</h1>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg p-6">
+        {% if notifications %}
+            <div class="divide-y divide-slate-200">
+                {% for notification in notifications %}
+                    <div class="py-4 {% if not notification.is_read %}bg-blue-50 rounded-md px-4{% endif %} flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-800 {% if not notification.is_read %}font-semibold{% endif %}">{{ notification.message }}</p>
+                            <p class="text-sm text-slate-500">{{ notification.timestamp|date:"d/m/Y H:i" }}</p>
+                        </div>
+                        {% if not notification.is_read %}
+                            <a href="{% url 'mark-notification-as-read' notification.pk %}" class="px-3 py-1 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">Đánh dấu đã đọc</a>
+                        {% else %}
+                            <span class="px-3 py-1 rounded-md text-sm font-medium text-slate-500 bg-slate-100">Đã đọc</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-slate-500 text-center py-4">Bạn không có thông báo nào.</p>
+        {% endif %}
+    </div>
+{% endblock %}

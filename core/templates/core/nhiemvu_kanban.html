@@ -1,0 +1,42 @@
+{% extends 'core/base.html' %}
+{% load custom_filters %}
+
+{% block title %}Kanban Nhiệm vụ{% endblock %}
+
+{% block content %}
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-slate-800">Kanban Board</h1>
+        <a href="{% url 'nhiemvu-create' %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">Tạo Nhiệm vụ mới</a>
+    </div>
+
+    <div class="flex space-x-4 overflow-x-auto pb-4">
+        {% for status_code, status_name in task_statuses %}
+            <div class="flex-shrink-0 w-80 bg-slate-100 p-4 rounded-xl">
+                <h2 class="text-lg font-semibold mb-4 text-slate-700 px-2">{{ status_name }}</h2>
+                <div class="space-y-4">
+                    {% for task in tasks_by_status|get_item:status_name %}
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 hover:shadow-md hover:border-indigo-500 transition-all cursor-pointer">
+                            <a href="{% url 'nhiemvu-detail' task.pk %}" class="block">
+                                <h3 class="font-semibold text-slate-800 mb-2">{{ task.ten_nhiem_vu }}</h3>
+                                <div class="flex justify-between items-center text-sm text-slate-500">
+                                    <span>{{ task.id_nguoi_thuc_hien.username|default:"Chưa giao" }}</span>
+                                    <span>{{ task.ngay_ket_thuc|date:"d/m/Y" }}</span>
+                                </div>
+                                <div class="mt-2">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full 
+                                        {% if task.muc_do_uu_tien == 'KHAN' %} bg-red-100 text-red-800
+                                        {% elif task.muc_do_uu_tien == 'CAO' %} bg-orange-100 text-orange-800
+                                        {% else %} bg-slate-100 text-slate-800 {% endif %}">
+                                        {{ task.get_muc_do_uu_tien_display }}
+                                    </span>
+                                </div>
+                            </a>
+                        </div>
+                    {% empty %}
+                        <p class="text-sm text-slate-500 px-2">Không có nhiệm vụ nào trong trạng thái này.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

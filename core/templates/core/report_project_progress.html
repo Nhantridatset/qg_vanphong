@@ -1,0 +1,42 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Báo cáo Tiến độ Dự án{% endblock %}
+
+{% block content %}
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-slate-800">Báo cáo Tiến độ Dự án</h1>
+        <div class="flex space-x-3">
+            <a href="{% url 'export-project-progress-pdf' %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors">Xuất PDF</a>
+            <a href="{% url 'export-project-progress-excel' %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition-colors">Xuất Excel</a>
+        </div>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Tên Dự án</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Mã Dự án</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Trạng thái</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Ngày bắt đầu</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Ngày kết thúc</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-slate-200">
+                {% for project in projects %}
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">{{ project.ten_du_an }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ project.ma_du_an|default:"N/A" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ project.get_trang_thai_display }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ project.ngay_bat_dau|date:"d/m/Y" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ project.ngay_ket_thuc|date:"d/m/Y" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-sm text-slate-500">Không có dự án nào để hiển thị báo cáo.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

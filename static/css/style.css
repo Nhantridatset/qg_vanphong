@@ -1,0 +1,265 @@
+/* qg_vanphong/static/css/style.css */
+
+:root {
+    --color-primary: #6366F1; /* Indigo 500 */
+    --color-secondary: #8B5CF6; /* Violet 500 */
+    --color-accent: #EC4899; /* Pink 500 */
+    --color-background: #F3F4F6; /* Gray 100 */
+    --color-text: #1F2937; /* Gray 900 */
+    --color-success: #10B981; /* Green 500 */
+    --color-error: #EF4444; /* Red 500 */
+    --color-warning: #F59E0B; /* Yellow 500 */
+    --color-info: #3B82F6; /* Blue 500 */
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    margin: 0;
+    padding: 0;
+}
+
+nav {
+    background-color: var(--color-primary);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 48px; /* h-12 */
+    display: flex;
+    align-items: center;
+}
+
+nav .container {
+    max-width: 960px; /* max-w-5xl */
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 12px; /* px-3 */
+    padding-right: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+nav .logo {
+    font-size: 2rem; /* text-2xl */
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+nav .logo:hover {
+    color: #E0E7FF; /* gray-200 */
+}
+
+nav .nav-links a {
+    padding: 8px 16px; /* px-4 py-2 */
+    border-radius: 9999px; /* rounded-full */
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 500;
+    color: white;
+    text-decoration: none;
+    margin-left: 16px; /* space-x-4 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+nav .nav-links a.btn-secondary {
+    background-color: var(--color-secondary);
+}
+
+nav .nav-links a.btn-secondary:hover {
+    background-color: #6D28D9; /* violet-700 */
+    transform: translateY(-2px);
+}
+
+nav .nav-links a.btn-accent {
+    background-color: var(--color-accent);
+}
+
+nav .nav-links a.btn-accent:hover {
+    background-color: #BE185D; /* pink-700 */
+    transform: translateY(-2px);
+}
+
+main .container {
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 32px 16px; /* py-8 px-4 */
+}
+
+.messages {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 24px; /* mb-6 */
+}
+
+.messages li {
+    padding: 16px; /* p-4 */
+    border-radius: 8px; /* rounded-lg */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 12px; /* space-y-3 */
+}
+
+.messages li.success {
+    background-color: var(--color-success);
+    color: white;
+}
+
+.messages li.error {
+    background-color: var(--color-error);
+    color: white;
+}
+
+.messages li.warning {
+    background-color: var(--color-warning);
+    color: white;
+}
+
+.messages li.info {
+    background-color: var(--color-info);
+    color: white;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 50;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+    width: 100%;
+    max-width: 448px;
+    text-align: center;
+    transform: scale(0.95);
+    opacity: 0;
+    transition: all 0.3s ease-out;
+}
+
+.modal-overlay.show .modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--color-primary);
+    margin-bottom: 16px;
+}
+
+.modal-textarea {
+    width: 100%;
+    height: 256px;
+    padding: 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+    resize: none;
+    color: var(--color-text);
+    font-size: 1rem;
+}
+
+.modal-button {
+    padding: 12px 24px;
+    background-color: var(--color-primary);
+    color: white;
+    font-size: 1.125rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.modal-button:hover {
+    background-color: #4F46E5; /* indigo-700 */
+    transform: translateY(-2px);
+}
+
+/* Form Styles (for login.html and other forms) */
+.form-container {
+    max-width: 512px; /* max-w-md */
+    margin: 48px auto; /* mt-12 mx-auto */
+    padding: 32px; /* p-8 */
+    background-color: white;
+    border-radius: 8px; /* rounded-lg */
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.form-title {
+    font-size: 2.25rem; /* text-3xl */
+    font-weight: bold;
+    text-align: center;
+    color: var(--color-primary);
+    margin-bottom: 32px; /* mb-8 */
+}
+
+.form-group {
+    margin-bottom: 24px; /* mb-6 */
+}
+
+.form-label {
+    display: block;
+    color: var(--color-text);
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 600;
+    margin-bottom: 8px; /* mb-2 */
+}
+
+.form-input {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    appearance: none;
+    border: 1px solid #D1D5DB; /* border-gray-300 */
+    border-radius: 8px; /* rounded-lg */
+    width: 100%;
+    padding: 12px 16px; /* py-3 px-4 */
+    color: var(--color-text);
+    line-height: 1.5;
+    transition: all 0.2s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5); /* ring-2 ring-primary */
+}
+
+.form-button {
+    background-color: var(--color-primary);
+    color: white;
+    font-weight: bold;
+    padding: 12px 24px; /* py-3 px-6 */
+    border-radius: 9999px; /* rounded-full */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    border: none;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+}
+
+.form-button:hover {
+    background-color: #4F46E5; /* indigo-700 */
+    transform: translateY(-2px);
+}
+
+.form-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.5); /* ring-4 ring-primary */
+}
+
+.hidden {
+    display: none !important;
+}

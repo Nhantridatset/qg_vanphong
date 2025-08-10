@@ -1,0 +1,79 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Lịch Nhiệm vụ{% endblock %}
+
+{% block content %}
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-slate-800">Lịch công việc</h1>
+        <a href="{% url 'nhiemvu-create' %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">Tạo Nhiệm vụ mới</a>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow-md">
+        <div id='calendar'></div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.18/index.global.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'vi', // Set locale to Vietnamese
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,listWeek'
+                },
+                events: '{% url "nhiemvu-calendar-data" %}', // API endpoint to fetch events
+                editable: true, // Enable drag and drop
+                eventDrop: function(info) {
+                    // Called when an event is dragged and dropped
+                    const taskId = info.event.id;
+                    const newEndDate = info.event.end ? info.event.end.toISOString() : info.event.start.toISOString();
+
+                    fetch('{% url "update-task-date-from-calendar" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}' // Include CSRF token
+                        },
+                        body: JSON.stringify({
+                            task_id: taskId,
+                            new_end_date: newEndDate
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            console.log('Task date updated successfully!');
+                        } else {
+                            console.error('Error updating task date:', data.message);
+                            info.revert(); // Revert the event's position if update fails
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Network error:', error);
+                        info.revert(); // Revert on network error
+                    });
+                },
+                eventClick: function(info) {
+                    if (info.event.url) {
+                        window.location.href = info.event.url;
+                        info.jsEvent.preventDefault();
+                    }
+                },
+                eventColor: '#4f46e5', // Indigo color for events
+                eventTextColor: '#ffffff',
+                dayMaxEventRows: true, // for all non-TimeGrid views
+                views: {
+                    timeGrid: {
+                        dayMaxEventRows: 6 // adjust to 6 only for timeGridWeek/timeGridDay
+                    }
+                }
+            });
+            calendar.render();
+        });
+    </script>
+{% endblock %}

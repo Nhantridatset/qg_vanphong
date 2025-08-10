@@ -1,0 +1,52 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Biểu đồ Gantt Nhiệm vụ{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'frappe_gantt/frappe-gantt.css' %}" />
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-2xl font-bold mb-4">Biểu đồ Gantt Nhiệm vụ</h1>
+
+    <div class="gantt-container">
+        <svg id="gantt"></svg>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'frappe_gantt/frappe-gantt.min.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('{% url "nhiemvu-gantt-data" %}')
+                .then(response => response.json())
+                .then(tasks => {
+                    const gantt = new Gantt('#gantt', tasks, {
+                        header_height: 50,
+                        column_width: 30,
+                        step: 24,
+                        view_modes: ['Quarter Day', 'Half Day', 'Day', 'Week', 'Month'],
+                        bar_height: 20,
+                        bar_corner_radius: 3,
+                        arrow_curve: 5,
+                        padding: 18,
+                        view_mode: 'Week',
+                        date_format: 'YYYY-MM-DD',
+                        language: 'en',
+                        custom_popup_html: function(task) {
+                            return `
+                                <div class="details-container">
+                                    <h5>${task.name}</h5>
+                                    <p>Bắt đầu: ${task.start}</p>
+                                    <p>Kết thúc: ${task.end}</p>
+                                    <p>Tiến độ: ${task.progress}%</p>
+                                    <p>Phụ thuộc: ${task.dependencies}</p>
+                                </div>
+                            `;
+                        }
+                    });
+                });
+        });
+    </script>
+{% endblock %}

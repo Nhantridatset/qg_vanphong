@@ -1,0 +1,45 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Chi tiết Hồ sơ công việc{% endblock %}
+
+{% block content %}
+    <div class="bg-white p-8 rounded-xl shadow-md">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-800">{{ object.ten_ho_so_cong_viec }}</h1>
+                <p class="text-sm text-slate-500">Mã hồ sơ công việc: {{ object.ma_ho_so_cong_viec|default:"N/A" }}</p>
+            </div>
+            <span class="text-sm font-semibold px-3 py-1 rounded-full 
+                {% if object.trang_thai == 'HOAN_THANH' %} bg-green-100 text-green-800 
+                {% elif object.trang_thai == 'DA_DUYET' %} bg-indigo-100 text-indigo-800
+                {% elif object.trang_thai == 'DA_TU_CHOI' %} bg-red-100 text-red-800
+                {% else %} bg-blue-100 text-blue-800 {% endif %}">
+                {{ object.get_trang_thai_display }}
+            </span>
+        </div>
+
+        <div class="mt-6 border-t border-slate-200 pt-6">
+            <h2 class="text-lg font-semibold text-slate-700 mb-2">Mô tả chi tiết</h2>
+            <p class="text-slate-600">{{ object.mo_ta|linebreaks }}</p>
+        </div>
+
+        <div class="mt-6 border-t border-slate-200 pt-6">
+            <h2 class="text-lg font-semibold text-slate-700 mb-2">Thông tin chung</h2>
+            <p class="text-slate-600"><strong>Phân loại lĩnh vực:</strong> {{ object.phan_loai_linh_vuc }}</p>
+            <p class="text-slate-600"><strong>Căn cứ pháp lý:</strong> {{ object.can_cu_phap_ly }}</p>
+            <p class="text-slate-600"><strong>Ngày bắt đầu:</strong> {{ object.ngay_bat_dau|date:"d/m/Y"|default:"N/A" }}</p>
+            <p class="text-slate-600"><strong>Ngày kết thúc:</strong> {{ object.ngay_ket_thuc|date:"d/m/Y"|default:"N/A" }}</p>
+            <p class="text-slate-600"><strong>Người quản lý:</strong> {{ object.id_nguoi_quan_ly|default:"N/A" }}</p>
+            <p class="text-slate-600"><strong>Đơn vị chủ trì:</strong> {{ object.id_don_vi_chu_tri|default:"N/A" }}</p>
+        </div>
+
+        <div class="mt-8 flex items-center justify-start space-x-4">
+            {% if request.user.is_authenticated and request.user.role == 'LANH_DAO_CO_QUAN' and object.trang_thai == 'CHO_PHE_DUYET' %}
+                <a href="{% url 'approve-hosocongviec' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition-colors">Duyệt Hồ sơ công việc</a>
+            {% endif %}
+            <a href="{% url 'hosocongviec-update' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">Sửa</a>
+            <a href="{% url 'hosocongviec-delete' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors">Xóa</a>
+            <a href="{% url 'hosocongviec-list' %}" class="px-4 py-2 rounded-md text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors">Quay lại</a>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Chi tiết Tệp Đính Kèm" %}{% endblock %}
+
+{% block content %}
+    <div class="bg-white p-8 rounded-xl shadow-md">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-800">{% trans "Tệp Đính Kèm" %}: {{ object.file.name }}</h1>
+            </div>
+        </div>
+
+        <div class="mt-6 border-t border-slate-200 pt-6">
+            <h2 class="text-lg font-semibold text-slate-700 mb-2">{% trans "Thông tin Tệp Đính Kèm" %}</h2>
+            <p class="text-slate-600 mb-2"><strong class="font-semibold">{% trans "Tệp" %}:</strong> <a href="{{ object.file.url }}" target="_blank" class="text-indigo-600 hover:underline">{{ object.file.name }}</a></p>
+            <p class="text-slate-600 mb-2"><strong class="font-semibold">{% trans "Người Tải Lên" %}:</strong> {{ object.uploader.username }}</p>
+            {% if object.nhiem_vu %}
+                <p class="text-slate-600 mb-2"><strong class="font-semibold">{% trans "Nhiệm vụ" %}:</strong> <a href="{% url 'nhiemvu-detail' object.nhiem_vu.pk %}" class="text-indigo-600 hover:underline">{{ object.nhiem_vu.ten_nhiem_vu }}</a></p>
+            {% endif %}
+            {% if object.du_an %}
+                <p class="text-slate-600 mb-2"><strong class="font-semibold">{% trans "Dự án" %}:</strong> <a href="{% url 'duan-detail' object.du_an.pk %}" class="text-indigo-600 hover:underline">{{ object.du_an.ten_du_an }}</a></p>
+            {% endif %}
+            {% if object.binh_luan %}
+                <p class="text-slate-600 mb-2"><strong class="font-semibold">{% trans "Bình luận" %}:</strong> <a href="{% url 'nhiemvu-detail' object.binh_luan.nhiem_vu.pk %}#comment-{{ object.binh_luan.pk }}" class="text-indigo-600 hover:underline">{% trans "Xem bình luận" %}</a></p>
+            {% endif %}
+        </div>
+
+        <div class="mt-8 flex items-center justify-start space-x-4">
+            <a href="{% url 'tepdinhkem-update' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">{% trans "Sửa" %}</a>
+            <a href="{% url 'tepdinhkem-delete' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors">{% trans "Xóa" %}</a>
+            <a href="{% url 'tepdinhkem-list' %}" class="px-4 py-2 rounded-md text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors">{% trans "Quay lại" %}</a>
+        </div>
+    </div>
+{% endblock %}
