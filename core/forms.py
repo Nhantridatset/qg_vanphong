@@ -1,5 +1,6 @@
 from django import forms
 import json
+from django.db.models import Q
 from django.utils import timezone
 from .models import HoSoCongViec, KeHoach, MocThoiGian, NhiemVu, CoQuan, PhongBan, TepDinhKem, LichSuCongViec, BinhLuan, CustomReport, LoaiNhiemVu, TruongDuLieu, GiaTriTruongDuLieu, GiaiNgan, GoiThau
 from users.models import CustomUser
@@ -58,6 +59,7 @@ class NhiemVuForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        print("DEBUG: NhiemVuForm __init__ called.")
         self.request_user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         if not self.instance.pk: # Only set default for new instances
@@ -87,11 +89,15 @@ class NhiemVuForm(forms.ModelForm):
                     self.fields['id_nguoi_thuc_hien'].queryset = CustomUser.objects.none()
             elif self.request_user.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG:
                 # Chuyen vien Van phong can assign to Lanh dao Phong (special approval flow)
+                # and also to themselves.
                 self.fields['id_nguoi_thuc_hien'].queryset = CustomUser.objects.filter(
-                    role=CustomUser.Role.LANH_DAO_PHONG
+                    Q(role=CustomUser.Role.LANH_DAO_PHONG) | Q(pk=self.request_user.pk)
                 ).exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
             elif self.request_user.role == CustomUser.Role.CHUYEN_VIEN_PHONG:
                 # Chuyen vien Phong can only assign to themselves
+                self.fields['id_nguoi_thuc_hien'].queryset = CustomUser.objects.filter(pk=self.request_user.pk).exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
+            elif self.request_user.role == CustomUser.Role.CHUYEN_VIEN:
+                # Chuyen vien can only assign to themselves
                 self.fields['id_nguoi_thuc_hien'].queryset = CustomUser.objects.filter(pk=self.request_user.pk).exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
             else:
                 # Default: no assignment or specific roles

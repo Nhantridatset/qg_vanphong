@@ -11,7 +11,13 @@
         <div class="flex justify-between items-start mb-4">
             <div>
                 <h1 class="text-3xl font-bold text-slate-800">{{ object.ten_nhiem_vu }}</h1>
-                <p class="text-sm text-slate-500">Trong kế hoạch: <a href="{% url 'kehoach-detail' object.id_ke_hoach.pk %}" class="text-indigo-600 hover:underline">{{ object.id_ke_hoach.ten_ke_hoach }}</a></p>
+                <p class="text-sm text-slate-500">Trong kế hoạch: 
+                    {% if object.id_ke_hoach %}
+                        <a href="{% url 'kehoach-detail' object.id_ke_hoach.pk %}" class="text-indigo-600 hover:underline">{{ object.id_ke_hoach.ten_ke_hoach }}</a>
+                    {% else %}
+                        Không có kế hoạch liên quan.
+                    {% endif %}
+                </p>
             </div>
             <span class="text-sm font-semibold px-3 py-1 rounded-full 
                 {% if object.trang_thai == 'COMPLETED' %} bg-green-100 text-green-800 
@@ -45,7 +51,7 @@
         
 
         <div class="mt-8 flex items-center justify-start space-x-4">
-            {% if object.trang_thai == 'PENDING_ASSIGNMENT_APPROVAL' and request.user.is_authenticated and (request.user.role == 'LANH_DAO_CO_QUAN' or request.user.role == 'LANH_DAO_VAN_PHONG') %}
+            {% if object.trang_thai == 'PENDING_ASSIGNMENT_APPROVAL' and request.user.is_authenticated and request.user.role == 'LANH_DAO_CO_QUAN' or object.trang_thai == 'PENDING_ASSIGNMENT_APPROVAL' and request.user.is_authenticated and request.user.role == 'LANH_DAO_VAN_PHONG' %}
                 <a href="{% url 'approve-assignment' object.pk %}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                     Phê duyệt phân công
                 </a>
@@ -60,7 +66,7 @@
                 <a href="{% url 'approve-completion-and-rate-nhiemvu' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition-colors">Phê duyệt hoàn thành & Chấm điểm</a>
             {% endif %}
 
-            {% if request.user.is_authenticated and (request.user == object.id_nguoi_tao or request.user == object.id_nguoi_giao_viec or request.user.role == 'LANH_DAO_CO_QUAN' or request.user.role == 'LANH_DAO_VAN_PHONG') %}
+            {% if request.user.is_authenticated and request.user == object.id_nguoi_tao or request.user.is_authenticated and request.user == object.id_nguoi_giao_viec or request.user.is_authenticated and request.user.role == 'LANH_DAO_CO_QUAN' or request.user.is_authenticated and request.user.role == 'LANH_DAO_VAN_PHONG' %}
                 <a href="{% url 'nhiemvu-update' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">Sửa</a>
                 <a href="{% url 'nhiemvu-delete' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors">Xóa</a>
             {% endif %}

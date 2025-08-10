@@ -799,7 +799,7 @@ class NhiemVuListView(LoginRequiredMixin, ListView):
                 return NhiemVu.objects.filter(id_phong_ban_lien_quan=user.phong_ban)
             else:
                 return NhiemVu.objects.none()
-        elif user.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG or user.role == CustomUser.Role.CHUYEN_VIEN_PHONG:
+        elif user.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG or user.role == CustomUser.Role.CHUYEN_VIEN_PHONG or user.role == CustomUser.Role.CHUYEN_VIEN:
             # Chuyên viên (Personal View): Chỉ thấy nhiệm vụ của bản thân (người thực hiện hoặc người giao việc).
             return NhiemVu.objects.filter(id_nguoi_thuc_hien=user) | NhiemVu.objects.filter(id_nguoi_giao_viec=user)
         else:

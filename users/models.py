@@ -8,6 +8,7 @@ class CustomUser(AbstractUser):
         LANH_DAO_PHONG = 'LANH_DAO_PHONG', 'Lãnh đạo Phòng'
         CHUYEN_VIEN_VAN_PHONG = 'CHUYEN_VIEN_VAN_PHONG', 'Chuyên viên Văn phòng'
         CHUYEN_VIEN_PHONG = 'CHUYEN_VIEN_PHONG', 'Chuyên viên Phòng'
+        CHUYEN_VIEN = 'CHUYEN_VIEN', 'Chuyên viên'
 
     role = models.CharField(max_length=50, choices=Role.choices, default=Role.CHUYEN_VIEN_PHONG)
     co_quan = models.ForeignKey('core.CoQuan', on_delete=models.CASCADE, null=True, blank=True)
