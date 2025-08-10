@@ -9,35 +9,3 @@ def get_item(dictionary, key):
 @register.filter
 def repeat_string(value, arg):
     return str(value) * int(arg)
-
-@register.filter
-def repeat_string(value, arg):
-    return str(value) * int(arg)
-
-@register.filter
-def repeat_string(value, arg):
-    return str(value) * int(arg)
-
-@register.filter
-def repeat_string(value, arg):
-    return str(value) * int(arg)
-
-@register.filter
-def repeat_string(value, arg):
-    return str(value) * int(arg)
-
-@register.filter
-def repeat_string(value, arg):
-    return str(value) * int(arg)
-
-@register.filter
-def repeat_string(value, arg):
-    return str(value) * int(arg)
-
-@register.filter
-def repeat_string(value, arg):
-    return str(value) * int(arg)
-
-@register.filter
-def repeat_string(value, arg):
-    return str(value) * int(arg)

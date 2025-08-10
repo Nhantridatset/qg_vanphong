@@ -1,0 +1,32 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Phê duyệt giao nhiệm vụ{% endblock %}
+
+{% block content %}
+    <div class="container mx-auto p-6 bg-white rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold text-slate-800 mb-4">Phê duyệt giao nhiệm vụ</h1>
+
+        <div class="mb-6 p-4 border rounded-lg bg-slate-50">
+            <h2 class="text-xl font-semibold text-slate-700 mb-2">Chi tiết nhiệm vụ</h2>
+            <p><strong>Tên nhiệm vụ:</strong> {{ nhiemvu.ten_nhiem_vu }}</p>
+            <p><strong>Mô tả:</strong> {{ nhiemvu.mo_ta }}</p>
+            <p><strong>Người tạo:</strong> {{ nhiemvu.id_nguoi_tao.username }}</p>
+            <p><strong>Người giao việc:</strong> {{ nhiemvu.id_nguoi_giao_viec.username }}</p>
+            <p><strong>Người thực hiện:</strong> {{ nhiemvu.id_nguoi_thuc_hien.username }}</p>
+            <p><strong>Trạng thái hiện tại:</strong> {{ nhiemvu.get_trang_thai_display }}</p>
+            <p><strong>Ngày kết thúc:</strong> {{ nhiemvu.ngay_ket_thuc|date:"d/m/Y H:i" }}</p>
+        </div>
+
+        <p class="text-lg text-slate-700 mb-4">Bạn có muốn phê duyệt việc giao nhiệm vụ này không?</p>
+
+        <form method="post" action="{% url 'approve-assignment' nhiemvu.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Phê duyệt
+            </button>
+            <a href="{% url 'nhiemvu-detail' nhiemvu.pk %}" class="ml-4 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Hủy
+            </a>
+        </form>
+    </div>
+{% endblock %}

@@ -52,6 +52,12 @@ urlpatterns = [
     path('nhiemvu/<int:pk>/edit/', views.NhiemVuUpdateView.as_view(), name='nhiemvu-update'),
     path('nhiemvu/<int:pk>/delete/', views.NhiemVuDeleteView.as_view(), name='nhiemvu-delete'),
 
+    # Assignment Approval URL
+    path('nhiemvu/<int:pk>/approve-assignment/', views.approve_assignment_view, name='approve-assignment'),
+
+    # Extension Request URL
+    path('nhiemvu/<int:pk>/request-extension/', views.request_extension_view, name='request-extension'),
+
     # CoQuan URLs
     path('coquan/', views.CoQuanListView.as_view(), name='coquan-list'),
     path('coquan/<int:pk>/', views.CoQuanDetailView.as_view(), name='coquan-detail'),
@@ -94,4 +100,5 @@ urlpatterns = [
 
     # Completion and Rating URL
     path('nhiemvu/<int:pk>/complete-and-rate/', views.complete_and_rate_nhiemvu_view, name='complete-and-rate-nhiemvu'),
+    path('nhiemvu/<int:pk>/approve-completion-and-rate/', views.approve_completion_and_rate_nhiemvu_view, name='approve-completion-and-rate-nhiemvu'),
 ]

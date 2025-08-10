@@ -26,21 +26,60 @@ def logout_view(request):
 
 @login_required
 def user_list(request):
-    if request.user.is_superuser:
+    user = request.user
+    if user.is_superuser or user.role == CustomUser.Role.LANH_DAO_CO_QUAN:
         users = CustomUser.objects.all()
-    elif request.user.is_authenticated and request.user.role == 'admin_co_quan' and request.user.co_quan:
-        users = CustomUser.objects.filter(co_quan=request.user.co_quan)
+    elif user.role == CustomUser.Role.LANH_DAO_VAN_PHONG:
+        if user.phong_ban and user.phong_ban.co_quan:
+            users = CustomUser.objects.filter(
+                phong_ban__co_quan=user.phong_ban.co_quan,
+                role__in=[CustomUser.Role.LANH_DAO_PHONG, CustomUser.Role.CHUYEN_VIEN_VAN_PHONG]
+            )
+        else:
+            users = CustomUser.objects.none()
+    elif user.role == CustomUser.Role.LANH_DAO_PHONG:
+        if user.phong_ban:
+            users = CustomUser.objects.filter(phong_ban=user.phong_ban, role=CustomUser.Role.CHUYEN_VIEN_PHONG)
+        else:
+            users = CustomUser.objects.none()
+    elif user.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG or user.role == CustomUser.Role.CHUYEN_VIEN_PHONG:
+        users = CustomUser.objects.filter(pk=user.pk) # Only see themselves
     else:
-        users = CustomUser.objects.none() # Other roles see no users by default
+        users = CustomUser.objects.none()
     return render(request, 'users/user_list.html', {'users': users})
 
 @login_required
 def user_detail(request, pk):
     user_obj = get_object_or_404(CustomUser, pk=pk)
-    if request.user.is_authenticated and request.user.role == 'admin_co_quan':
-        if user_obj.co_quan != request.user.co_quan:
+    user = request.user
+
+    if user.is_superuser or user.role == CustomUser.Role.LANH_DAO_CO_QUAN:
+        pass # Global view
+    elif user.role == CustomUser.Role.LANH_DAO_VAN_PHONG:
+        # Lanh dao Van phong can see Lanh dao Phong and Chuyen vien Van phong within their agency
+        if user.phong_ban and user.phong_ban.co_quan and user_obj.phong_ban and user_obj.phong_ban.co_quan == user.phong_ban.co_quan and \
+           user_obj.role in [CustomUser.Role.LANH_DAO_PHONG, CustomUser.Role.CHUYEN_VIEN_VAN_PHONG]:
+            pass
+        else:
             messages.error(request, 'Bạn không có quyền truy cập người dùng này.')
             return redirect('user_list')
+    elif user.role == CustomUser.Role.LANH_DAO_PHONG:
+        # Lanh dao Phong can see Chuyen vien Phong in their department
+        if user.phong_ban and user_obj.phong_ban == user.phong_ban and user_obj.role == CustomUser.Role.CHUYEN_VIEN_PHONG:
+            pass
+        else:
+            messages.error(request, 'Bạn không có quyền truy cập người dùng này.')
+            return redirect('user_list')
+    elif user.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG or user.role == CustomUser.Role.CHUYEN_VIEN_PHONG:
+        # Chuyen vien can only see themselves
+        if user_obj.pk == user.pk:
+            pass
+        else:
+            messages.error(request, 'Bạn không có quyền truy cập người dùng này.')
+            return redirect('user_list')
+    else:
+        messages.error(request, 'Bạn không có quyền truy cập người dùng này.')
+        return redirect('user_list')
     return render(request, 'users/user_detail.html', {'user': user_obj})
 
 @login_required

@@ -1,5 +1,6 @@
 from django import forms
 import json
+from django.utils import timezone
 from .models import HoSoCongViec, KeHoach, MocThoiGian, NhiemVu, CoQuan, PhongBan, TepDinhKem, LichSuCongViec, BinhLuan, CustomReport, LoaiNhiemVu, TruongDuLieu, GiaTriTruongDuLieu, GiaiNgan, GoiThau
 from users.models import CustomUser
 
@@ -12,6 +13,11 @@ class HoSoCongViecForm(forms.ModelForm):
             'ngay_ket_thuc': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.instance.pk: # Only set default for new instances
+            self.initial['ngay_bat_dau'] = timezone.now()
+
 class KeHoachForm(forms.ModelForm):
     class Meta:
         model = KeHoach
@@ -20,6 +26,11 @@ class KeHoachForm(forms.ModelForm):
             'thoi_gian_bat_dau': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'thoi_gian_ket_thuc': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.instance.pk: # Only set default for new instances
+            self.initial['thoi_gian_bat_dau'] = timezone.now()
 
 class MocThoiGianForm(forms.ModelForm):
     class Meta:
@@ -32,14 +43,87 @@ class MocThoiGianForm(forms.ModelForm):
 class NhiemVuForm(forms.ModelForm):
     class Meta:
         model = NhiemVu
-        fields = '__all__'
+        fields = [
+            'ten_nhiem_vu', 'mo_ta', 'muc_do_uu_tien',
+            'ngay_bat_dau', 'ngay_ket_thuc',
+            'id_ke_hoach', 'id_nguoi_thuc_hien', 'id_nhiem_vu_cha',
+            'thoi_gian_uoc_tinh',
+            'is_recurring', 'recurring_frequency', 'recurring_until',
+        ]
         widgets = {
             'ngay_bat_dau': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'ngay_ket_thuc': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'thoi_gian_uoc_tinh': forms.NumberInput(attrs={'step': '0.5', 'min': '0'}),
-            'thoi_gian_thuc_te': forms.NumberInput(attrs={'step': '0.5', 'min': '0'}),
             'recurring_until': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        self.request_user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if not self.instance.pk: # Only set default for new instances
+            self.initial['ngay_bat_dau'] = timezone.now()
+
+        # Filter id_nguoi_thuc_hien (assignee) based on assignment rules
+        if self.request_user:
+            if self.request_user.role == CustomUser.Role.LANH_DAO_CO_QUAN:
+                # Super Admin can assign to anyone except themselves, and not to other Super Admins
+                self.fields['id_nguoi_thuc_hien'].queryset = CustomUser.objects.exclude(pk=self.request_user.pk).exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
+            elif self.request_user.role == CustomUser.Role.LANH_DAO_VAN_PHONG:
+                # Lanh dao Van phong can assign to Lanh dao Phong and Chuyen vien Van phong
+                self.fields['id_nguoi_thuc_hien'].queryset = CustomUser.objects.filter(
+                    role__in=[
+                        CustomUser.Role.LANH_DAO_PHONG,
+                        CustomUser.Role.CHUYEN_VIEN_VAN_PHONG
+                    ]
+                ).exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
+            elif self.request_user.role == CustomUser.Role.LANH_DAO_PHONG:
+                # Lanh dao Phong can assign to Chuyen vien Phong and other Lanh dao Phong in their department
+                if self.request_user.phong_ban:
+                    self.fields['id_nguoi_thuc_hien'].queryset = CustomUser.objects.filter(
+                        phong_ban=self.request_user.phong_ban,
+                        role__in=[CustomUser.Role.CHUYEN_VIEN_PHONG, CustomUser.Role.LANH_DAO_PHONG]
+                    ).exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
+                else:
+                    self.fields['id_nguoi_thuc_hien'].queryset = CustomUser.objects.none()
+            elif self.request_user.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG:
+                # Chuyen vien Van phong can assign to Lanh dao Phong (special approval flow)
+                self.fields['id_nguoi_thuc_hien'].queryset = CustomUser.objects.filter(
+                    role=CustomUser.Role.LANH_DAO_PHONG
+                ).exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
+            elif self.request_user.role == CustomUser.Role.CHUYEN_VIEN_PHONG:
+                # Chuyen vien Phong can only assign to themselves
+                self.fields['id_nguoi_thuc_hien'].queryset = CustomUser.objects.filter(pk=self.request_user.pk).exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
+            else:
+                # Default: no assignment or specific roles
+                self.fields['id_nguoi_thuc_hien'].queryset = CustomUser.objects.none().exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
+
+            # Filter id_ke_hoach (plan) based on user's role and associated projects/departments
+            if self.request_user.role == CustomUser.Role.LANH_DAO_CO_QUAN:
+                self.fields['id_ke_hoach'].queryset = KeHoach.objects.all()
+            elif self.request_user.role == CustomUser.Role.LANH_DAO_VAN_PHONG:
+                # Lanh dao Van phong sees plans related to their agency's departments
+                if self.request_user.phong_ban and self.request_user.phong_ban.co_quan:
+                    self.fields['id_ke_hoach'].queryset = KeHoach.objects.filter(
+                        id_du_an__id_don_vi_chu_tri__co_quan=self.request_user.phong_ban.co_quan
+                    )
+                else:
+                    self.fields['id_ke_hoach'].queryset = KeHoach.objects.none()
+            elif self.request_user.role == CustomUser.Role.LANH_DAO_PHONG:
+                # Lanh dao Phong sees plans related to their department
+                if self.request_user.phong_ban:
+                    self.fields['id_ke_hoach'].queryset = KeHoach.objects.filter(
+                        id_du_an__id_don_vi_chu_tri=self.request_user.phong_ban
+                    )
+                else:
+                    self.fields['id_ke_hoach'].queryset = KeHoach.objects.none()
+            else:
+                # Chuyen vien only sees plans related to tasks assigned to them or their department
+                self.fields['id_ke_hoach'].queryset = KeHoach.objects.filter(
+                    nhiem_vu__id_nguoi_thuc_hien=self.request_user
+                ).distinct() | KeHoach.objects.filter(
+                    id_du_an__id_don_vi_chu_tri=self.request_user.phong_ban
+                ).distinct()
+
 
 class BinhLuanForm(forms.ModelForm):
     class Meta:
@@ -62,7 +146,18 @@ class PhongBanForm(forms.ModelForm):
 class TepDinhKemForm(forms.ModelForm):
     class Meta:
         model = TepDinhKem
-        fields = '__all__'
+        fields = ['file', 'uploader', 'nhiem_vu', 'ho_so_cong_viec', 'ke_hoach', 'binh_luan']
+        widgets = {
+            'file': forms.FileInput(),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['nhiem_vu'].required = False
+        self.fields['ho_so_cong_viec'].required = False
+        self.fields['ke_hoach'].required = False
+        self.fields['binh_luan'].required = False
+        self.fields['uploader'].required = False # Uploader will be set in view
 
 class LichSuCongViecForm(forms.ModelForm):
     class Meta:
@@ -135,3 +230,11 @@ class GoiThauForm(forms.ModelForm):
     class Meta:
         model = GoiThau
         fields = '__all__'
+
+class ExtensionRequestForm(forms.ModelForm):
+    class Meta:
+        model = NhiemVu
+        fields = ['ngay_ket_thuc_de_xuat', 'ly_do_gia_han']
+        widgets = {
+            'ngay_ket_thuc_de_xuat': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }

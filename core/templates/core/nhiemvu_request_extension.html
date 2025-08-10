@@ -1,0 +1,52 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Yêu cầu gia hạn nhiệm vụ{% endblock %}
+
+{% block content %}
+    <div class="container mx-auto p-6 bg-white rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold text-slate-800 mb-4">Yêu cầu gia hạn nhiệm vụ</h1>
+
+        <div class="mb-6 p-4 border rounded-lg bg-slate-50">
+            <h2 class="text-xl font-semibold text-slate-700 mb-2">Chi tiết nhiệm vụ</h2>
+            <p><strong>Tên nhiệm vụ:</strong> {{ nhiemvu.ten_nhiem_vu }}</p>
+            <p><strong>Mô tả:</strong> {{ nhiemvu.mo_ta }}</p>
+            <p><strong>Người thực hiện:</strong> {{ nhiemvu.id_nguoi_thuc_hien.username }}</p>
+            <p><strong>Ngày kết thúc hiện tại:</strong> {{ nhiemvu.ngay_ket_thuc|date:"d/m/Y H:i" }}</p>
+        </div>
+
+        <form method="post" action="{% url 'request-extension' nhiemvu.pk %}">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label for="id_ngay_ket_thuc_de_xuat" class="block text-sm font-medium text-gray-700">Ngày kết thúc đề xuất:</label>
+                {{ form.ngay_ket_thuc_de_xuat }}
+            </div>
+            <div class="mb-4">
+                <label for="id_ly_do_gia_han" class="block text-sm font-medium text-gray-700">Lý do gia hạn:</label>
+                {{ form.ly_do_gia_han }}
+            </div>
+            
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Gửi yêu cầu gia hạn
+            </button>
+            <a href="{% url 'nhiemvu-detail' nhiemvu.pk %}" class="ml-4 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Hủy
+            </a>
+        </form>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Apply Tailwind classes to form fields
+        const ngayKetThucDeXuat = document.getElementById('id_ngay_ket_thuc_de_xuat');
+        if (ngayKetThucDeXuat) {
+            ngayKetThucDeXuat.classList.add('mt-1', 'block', 'w-full', 'px-3', 'py-2', 'border', 'border-gray-300', 'rounded-md', 'shadow-sm', 'focus:outline-none', 'focus:ring-indigo-500', 'focus:border-indigo-500', 'sm:text-sm');
+        }
+
+        const lyDoGiaHan = document.getElementById('id_ly_do_gia_han');
+        if (lyDoGiaHan) {
+            lyDoGiaHan.classList.add('mt-1', 'block', 'w-full', 'px-3', 'py-2', 'border', 'border-gray-300', 'rounded-md', 'shadow-sm', 'focus:outline-none', 'focus:ring-indigo-500', 'focus:border-indigo-500', 'sm:text-sm');
+            lyDoGiaHan.setAttribute('rows', '4');
+        }
+    });
+</script>
+{% endblock %}

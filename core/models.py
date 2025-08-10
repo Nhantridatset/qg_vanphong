@@ -76,12 +76,10 @@ class MocThoiGian(models.Model):
 
 class NhiemVu(models.Model):
     class TrangThai(models.TextChoices):
-        NV_CHO = 'NV_CHO', _('Chờ duyệt giao')
-        DANG_THUC_HIEN = 'DANG_THUC_HIEN', _('Đang thực hiện')
-        YEU_CAU_LAM_LAI = 'YEU_CAU_LAM_LAI', _('Yêu cầu làm lại')
-        DA_DUYET = 'DA_DUYET', _('Đã duyệt')
-        HOAN_THANH = 'HOAN_THANH', _('Hoàn thành')
-        NV_TTC = 'NV_TTC', _('Bị từ chối')
+        PENDING_ASSIGNMENT_APPROVAL = 'PENDING_ASSIGNMENT_APPROVAL', _('Chờ duyệt giao')
+        ASSIGNED = 'ASSIGNED', _('Đã giao')
+        PENDING_COMPLETION_APPROVAL = 'PENDING_COMPLETION_APPROVAL', _('Chờ duyệt hoàn thành')
+        COMPLETED = 'COMPLETED', _('Hoàn thành')
 
     class MucDoUuTien(models.TextChoices):
         KHAN = 'KHAN', _('Khẩn')
@@ -97,12 +95,18 @@ class NhiemVu(models.Model):
 
     ten_nhiem_vu = models.CharField(max_length=255, verbose_name=_('Tên nhiệm vụ'))
     mo_ta = models.TextField(verbose_name=_('Mô tả'))
-    trang_thai = models.CharField(max_length=50, choices=TrangThai.choices, default=TrangThai.NV_CHO, verbose_name=_('Trạng thái'))
+    trang_thai = models.CharField(max_length=50, choices=TrangThai.choices, default=TrangThai.PENDING_ASSIGNMENT_APPROVAL, verbose_name=_('Trạng thái'))
     muc_do_uu_tien = models.CharField(max_length=50, choices=MucDoUuTien.choices, default=MucDoUuTien.THUONG, verbose_name=_('Mức độ ưu tiên'))
     ngay_bat_dau = models.DateTimeField(verbose_name=_('Ngày bắt đầu'), null=True, blank=True)
     ngay_ket_thuc = models.DateTimeField(verbose_name=_('Ngày kết thúc'), null=True, blank=True)
-    id_ke_hoach = models.ForeignKey(KeHoach, on_delete=models.CASCADE, related_name='nhiem_vu', verbose_name=_('Kế hoạch'))
+    id_ke_hoach = models.ForeignKey(KeHoach, on_delete=models.SET_NULL, null=True, blank=True, related_name='nhiem_vu', verbose_name=_('Kế hoạch'))
+    
+    # New fields based on v6.md
+    id_nguoi_tao = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='nhiem_vu_da_tao', verbose_name=_('Người tạo'))
+    id_nguoi_giao_viec = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='nhiem_vu_da_giao', verbose_name=_('Người giao việc'))
     id_nguoi_thuc_hien = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='nhiem_vu_thuc_hien', verbose_name=_('Người thực hiện'))
+    id_phong_ban_lien_quan = models.ForeignKey(PhongBan, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Phòng ban liên quan'))
+
     id_nhiem_vu_cha = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='sub_tasks', verbose_name=_('Nhiệm vụ cha'))
     thoi_gian_uoc_tinh = models.FloatField(null=True, blank=True, verbose_name=_('Thời gian ước tính (giờ)'))
     thoi_gian_thuc_te = models.FloatField(null=True, blank=True, verbose_name=_('Thời gian thực tế (giờ)'))
@@ -114,6 +118,18 @@ class NhiemVu(models.Model):
 
     danh_gia_sao = models.IntegerField(null=True, blank=True, choices=[(i, str(i)) for i in range(1, 6)], verbose_name=_('Đánh giá sao'))
     loi_danh_gia = models.TextField(null=True, blank=True, verbose_name=_('Lời đánh giá'))
+
+    # Fields for task extension request
+    ngay_ket_thuc_de_xuat = models.DateTimeField(null=True, blank=True, verbose_name=_('Ngày kết thúc đề xuất'))
+    ly_do_gia_han = models.TextField(null=True, blank=True, verbose_name=_('Lý do gia hạn'))
+    
+    class TrangThaiGiaHan(models.TextChoices):
+        CHUA_DUYET = 'CHUA_DUYET', _('Chưa duyệt')
+        DA_DUYET = 'DA_DUYET', _('Đã duyệt')
+        DA_TU_CHOI = 'DA_TU_CHOI', _('Đã từ chối')
+    trang_thai_gia_han = models.CharField(max_length=50, choices=TrangThaiGiaHan.choices, default=TrangThaiGiaHan.CHUA_DUYET, verbose_name=_('Trạng thái gia hạn'))
+    
+    nguoi_duyet_gia_han = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='nhiem_vu_duyet_gia_han', verbose_name=_('Người duyệt gia hạn'))
 
     def __str__(self):
         return self.ten_nhiem_vu
@@ -136,6 +152,7 @@ class TepDinhKem(models.Model):
     uploader = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     nhiem_vu = models.ForeignKey(NhiemVu, on_delete=models.CASCADE, null=True, blank=True, related_name='tep_dinh_kem')
     ho_so_cong_viec = models.ForeignKey(HoSoCongViec, on_delete=models.CASCADE, null=True, blank=True, related_name='tep_dinh_kem')
+    ke_hoach = models.ForeignKey(KeHoach, on_delete=models.CASCADE, null=True, blank=True, related_name='tep_dinh_kem') # Added for KeHoach
     binh_luan = models.ForeignKey(BinhLuan, on_delete=models.CASCADE, null=True, blank=True, related_name='tep_dinh_kem')
 
 class LichSuCongViec(models.Model):
