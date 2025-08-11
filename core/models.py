@@ -131,8 +131,29 @@ class NhiemVu(models.Model):
     
     nguoi_duyet_gia_han = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='nhiem_vu_duyet_gia_han', verbose_name=_('Người duyệt gia hạn'))
 
+    # Fields for special approval workflow
+    is_quy_trinh_dac_biet = models.BooleanField(default=False, verbose_name=_('Quy trình đặc biệt'))
+    id_nguoi_duyet_giao_viec = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='nhiem_vu_da_duyet_giao', verbose_name=_('Người duyệt giao việc'))
+
+    # Fields for time tracking
+    ngay_hoan_thanh = models.DateTimeField(null=True, blank=True, verbose_name=_('Ngày hoàn thành'))
+
     def __str__(self):
         return self.ten_nhiem_vu
+
+    @property
+    def hoan_thanh_vao_cuoi_tuan(self):
+        if not self.ngay_hoan_thanh:
+            return False
+        # weekday() returns 0 for Monday and 6 for Sunday.
+        # 5 and 6 represent Saturday and Sunday.
+        return self.ngay_hoan_thanh.weekday() in [5, 6]
+
+    @property
+    def completion_approver(self):
+        if self.is_quy_trinh_dac_biet:
+            return self.id_nguoi_duyet_giao_viec
+        return self.id_nguoi_giao_viec
 
 class BinhLuan(models.Model):
     nhiem_vu = models.ForeignKey(NhiemVu, on_delete=models.CASCADE, related_name='binh_luan')

@@ -26,11 +26,11 @@
     </div>
     
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Công việc sắp hết hạn trong 1 ngày -->
+        <!-- Công việc hết hạn vào ngày mai -->
         <div class="md:col-span-3 bg-white p-6 rounded-xl shadow-md mb-6 border-l-4 border-red-500">
             <h2 class="text-xl font-semibold mb-3 text-red-700">Công việc hết hạn vào ngày mai</h2>
-            <div class="space-y-3">
-                {% for task in tasks_due_in_one_day %}
+            <div class="space-y-3 overflow-y-auto" style="max-height: 200px;"> {# Added max-height and overflow-y #}
+                {% for task in tasks_due_in_one_day|slice:":3" %} {# Limited to 3 tasks #}
                     <a href="{% url 'nhiemvu-detail' task.pk %}" class="block p-3 rounded-lg bg-red-50 hover:bg-red-100 transition-colors">
                         <p class="font-medium text-slate-800">{{ task.ten_nhiem_vu }}</p>
                         <p class="text-sm text-slate-500">Hết hạn: {{ task.ngay_ket_thuc|date:"d/m/Y" }}</p>
@@ -44,8 +44,8 @@
         <!-- Công việc sắp đến hạn (sắp xếp) -->
         <div class="md:col-span-3 bg-white p-6 rounded-xl shadow-md mb-6 border-l-4 border-amber-500">
             <h2 class="text-xl font-semibold mb-3 text-amber-700">Công việc sắp đến hạn</h2>
-            <div class="space-y-3">
-                {% for task in upcoming_tasks %}
+            <div class="space-y-3 overflow-y-auto" style="max-height: 200px;"> {# Added max-height and overflow-y #}
+                {% for task in upcoming_tasks|slice:":3" %} {# Limited to 3 tasks #}
                     <a href="{% url 'nhiemvu-detail' task.pk %}" class="block p-3 rounded-lg bg-amber-50 hover:bg-amber-100 transition-colors">
                         <p class="font-medium text-slate-800">{{ task.ten_nhiem_vu }}</p>
                         <p class="text-sm text-slate-500">Hết hạn: {{ task.ngay_ket_thuc|date:"d/m/Y" }}</p>
@@ -55,6 +55,47 @@
                 {% endfor %}
             </div>
         </div>
+
+        <!-- Công việc cần duyệt (Chỉ hiển thị cho các vai trò lãnh đạo) -->
+        {% if user.role == 'LANH_DAO_CO_QUAN' or user.role == 'LANH_DAO_VAN_PHONG' or user.role == 'LANH_DAO_PHONG' %}
+        <div class="md:col-span-3 bg-white p-6 rounded-xl shadow-md mb-6 border-l-4 border-purple-500">
+            <h2 class="text-xl font-semibold mb-3 text-purple-700">Công việc cần duyệt</h2>
+
+            {# Duyệt Giao #}
+            <h3 class="text-lg font-semibold mb-2 text-blue-700">Duyệt Giao</h3>
+            <div class="space-y-3 mb-4">
+                {% for task in pending_assignment_tasks %}
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
+                        <div>
+                            <p class="font-medium text-slate-800">{{ task.ten_nhiem_vu }}</p>
+                            <p class="text-sm text-slate-500">Người giao: {{ task.id_nguoi_giao_viec.username }}</p>
+                            <p class="text-sm text-slate-500">Người thực hiện: {{ task.id_nguoi_thuc_hien.username }}</p>
+                        </div>
+                        <a href="{% url 'approve-assignment' task.pk %}" class="px-3 py-1 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors">Duyệt</a>
+                    </div>
+                {% empty %}
+                    <p class="text-slate-500">Không có công việc nào chờ duyệt giao.</p>
+                {% endfor %}
+            </div>
+
+            {# Duyệt Hoàn thành #}
+            <h3 class="text-lg font-semibold mb-2 text-green-700">Duyệt Hoàn thành</h3>
+            <div class="space-y-3">
+                {% for task in pending_completion_tasks %}
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-green-50 hover:bg-green-100 transition-colors">
+                        <div>
+                            <p class="font-medium text-slate-800">{{ task.ten_nhiem_vu }}</p>
+                            <p class="text-sm text-slate-500">Người thực hiện: {{ task.id_nguoi_thuc_hien.username }}</p>
+                        </div>
+                        <a href="{% url 'approve-completion-and-rate-nhiemvu' task.pk %}" class="px-3 py-1 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition-colors">Duyệt & Chấm điểm</a>
+                    </div>
+                {% empty %}
+                    <p class="text-slate-500">Không có công việc nào chờ duyệt hoàn thành.</p>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
         <!-- Role-specific information cards -->
         {% if user.role == 'CHUYEN_VIEN' %}
             <div class="md:col-span-2 lg:col-span-3 bg-white p-6 rounded-xl shadow-md">
@@ -99,7 +140,11 @@
             <div class="md:col-span-2 lg:col-span-3 bg-white p-6 rounded-xl shadow-md mb-6">
                 <h2 class="text-xl font-semibold mb-3 text-slate-700">Hồ sơ công việc của Cơ quan</h2>
                 {% for project in agency_projects %}
-                    <a href="{% url 'hosocongviec-detail' project.pk %}" class="block p-3 rounded-lg bg-slate-50 hover:bg-slate-100">{{ project.ten_ho_so_cong_viec }}</a>
+                    <a href="{% url 'hosocongviec-detail' project.pk %}" class="block p-3 rounded-lg bg-slate-50 hover:bg-slate-100">
+                        <p class="font-medium text-slate-800">{{ project.ten_ho_so_cong_viec }}</p>
+                        <p class="text-sm text-slate-500">Đơn vị chủ trì: {{ project.id_don_vi_chu_tri }}</p>
+                        <p class="text-sm text-slate-500">Người quản lý: {{ project.id_nguoi_quan_ly }}</p>
+                    </a>
                 {% empty %}
                     <p class="text-slate-500">Không có hồ sơ công việc nào trong cơ quan của bạn.</p>
                 {% endfor %}
@@ -107,7 +152,11 @@
             <div class="md:col-span-2 lg:col-span-3 bg-white p-6 rounded-xl shadow-md mb-6">
                 <h2 class="text-xl font-semibold mb-3 text-slate-700">Kế hoạch của Cơ quan</h2>
                 {% for plan in agency_plans %}
-                    <a href="{% url 'kehoach-detail' plan.pk %}" class="block p-3 rounded-lg bg-slate-50 hover:bg-slate-100">{{ plan.ten_ke_hoach }}</a>
+                    <a href="{% url 'kehoach-detail' plan.pk %}" class="block p-3 rounded-lg bg-slate-50 hover:bg-slate-100">
+                        <p class="font-medium text-slate-800">{{ plan.ten_ke_hoach }}</p>
+                        <p class="text-sm text-slate-500">Đơn vị thực hiện: {{ plan.id_don_vi_thuc_hien }}</p>
+                        <p class="text-sm text-slate-500">Người phụ trách: {{ plan.id_nguoi_phu_trach }}</p>
+                    </a>
                 {% empty %}
                     <p class="text-slate-500">Không có kế hoạch nào trong cơ quan của bạn.</p>
                 {% endfor %}
@@ -115,7 +164,10 @@
             <div class="md:col-span-2 lg:col-span-3 bg-white p-6 rounded-xl shadow-md">
                 <h2 class="text-xl font-semibold mb-3 text-slate-700">Nhiệm vụ của Cơ quan</h2>
                 {% for task in agency_tasks %}
-                    <a href="{% url 'nhiemvu-detail' task.pk %}" class="block p-3 rounded-lg bg-slate-50 hover:bg-slate-100">{{ task.ten_nhiem_vu }}</a>
+                    <a href="{% url 'nhiemvu-detail' task.pk %}" class="block p-3 rounded-lg bg-slate-50 hover:bg-slate-100">
+                        <p class="font-medium text-slate-800">{{ task.ten_nhiem_vu }}</p>
+                        <p class="text-sm text-slate-500">Hết hạn: {{ task.ngay_ket_thuc|date:"d/m/Y" }}</p>
+                    </a>
                 {% empty %}
                     <p class="text-slate-500">Không có nhiệm vụ nào trong cơ quan của bạn.</p>
                 {% endfor %}

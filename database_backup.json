@@ -1,0 +1,224 @@
+[
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "admin",
+    "model": "logentry"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "auth",
+    "model": "permission"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "auth",
+    "model": "group"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "contenttypes",
+    "model": "contenttype"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "sessions",
+    "model": "session"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "core",
+    "model": "coquan"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "core",
+    "model": "customreport"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "core",
+    "model": "hosocongviec"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "core",
+    "model": "kehoach"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "core",
+    "model": "lichsucongviec"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "core",
+    "model": "mocthoigian"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "core",
+    "model": "nhiemvu"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "core",
+    "model": "notification"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "core",
+    "model": "phongban"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "core",
+    "model": "tepdinhkem"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "core",
+    "model": "binhluan"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "users",
+    "model": "customuser"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "core",
+    "model": "loainhiemvu"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "core",
+    "model": "truongdulieu"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "core",
+    "model": "giaingan"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "core",
+    "model": "goithau"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "core",
+    "model": "giatritruongdulieu"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "46yvj87bc1xnuzgyw9d21v8ji4e2cpoj",
+  "fields": {
+    "session_data": ".eJxVjMsOwiAQRf-FtSFToHTGpXu_gfAYpGpoUtqV8d-VpAvd3nPOfQnn9624vfHq5iTOQovT7xZ8fHDtIN19vS0yLnVb5yC7Ig_a5HVJ_Lwc7t9B8a30WgGipkwTaWM42OQtQRoVGpszZhthYOPBTuOgIGL4KgjAgSNR1izeH80TN70:1ul7Df:dE6ESu56wu1-Bo3NMJEpZboirIgALA_xXG-lsstYUyY",
+    "expire_date": "2025-08-24T14:40:19.222Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "4aslunfb9eyz5xvq172jdjre9mpn0gaj",
+  "fields": {
+    "session_data": ".eJxVjDsOwyAQBe9CHSFYfkvK9D4DAhYFJxFIxq6i3D1CcpG0b2bem4V47DUco2xhJXZlwC6_W4r5WdoE9Ijt3nnubd_WxKfCTzr40qm8bqf7d1DjqLPWxSsZYwZJCMkmhxa90SSsA-NlBgRERcJIhaStyYaE8wmBkMBL9vkCwWY2lw:1ulUPi:BoqpyigykgUgk5pS7smsSf5dHafQBz7I_i0exY99Uk8",
+    "expire_date": "2025-08-25T15:26:18.361Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "g4uxkc7lr6f1v8m23he6j1rym0n5mg6g",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGlnrTfwJJT1nsNbeNQ6gRIqTCnF3iJQC2jcz76UibWuNW5MljqzOyqrT75YoP2TaAd9pus06z9O6jEnvij5o09eZ5Xk53L-DSq1-a6S-FwM-YN8N6MRbkjKUAtARITIaQMQEYInEeydBvGEHOQUumUG9P8g9N7c:1ul6MF:tSjVr7Ykw4lano7CTzpROlYtE1tIAfn-tfurfPun9U0",
+    "expire_date": "2025-08-24T13:45:07.172Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "j58fj9yw07w5bmlk4s40na2z3h4pg6pl",
+  "fields": {
+    "session_data": ".eJxVjMsOwiAQRf-FtSFToHTGpXu_gfAYpGpoUtqV8d-VpAvd3nPOfQnn9624vfHq5iTOQovT7xZ8fHDtIN19vS0yLnVb5yC7Ig_a5HVJ_Lwc7t9B8a30WgGipkwTaWM42OQtQRoVGpszZhthYOPBTuOgIGL4KgjAgSNR1izeH80TN70:1ukiTz:Ui-WkNaSGs3LVFdB-7cPbFPKvqxHMOdjspCkWziM8Jw",
+    "expire_date": "2025-08-23T12:15:31.459Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "k5dc28kxpvrdmhagzwyc7b49elxj3qpa",
+  "fields": {
+    "session_data": ".eJxVjEEOgjAQRe_StWk6dIrUpXvO0ExnpoIaSCisjHdXEha6_e-9_zKJtnVIW9UljWIuBs3pd8vED512IHeabrPleVqXMdtdsQettp9Fn9fD_TsYqA7fumnVsbSRgiIBBd9mFO_O4FAdSC4ePKNAB01kKIReO5boYkDXYQHz_gDa2zdZ:1ulTFe:3Rfrh3eMMG30KDOg02AvsCu_p548D0uEDTW24macgLY",
+    "expire_date": "2025-08-25T14:11:50.499Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "kkmcw561ulr3cm9s5cylczrj9p6s0fgt",
+  "fields": {
+    "session_data": ".eJxVjEEOwiAQRe_C2hAGaAdcuvcMhIFBqoYmpV0Z765NutDtf-_9lwhxW2vYOi9hyuIsRnH63SimB7cd5Htst1mmua3LRHJX5EG7vM6Zn5fD_TuosddvnQZSbCxYZ1Ky0RlSQwGDxmLSxIWKJYbonYUygiblMTNqBYjgPaB4fwDf3jc-:1ulTEW:N6xoBdAdeUfxiv-SYyl2uYu0Czwd3jSOpwFl2v88_WA",
+    "expire_date": "2025-08-25T14:10:40.705Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "lqt3aj9qt1etoyot2n9zjmw4tbf599va",
+  "fields": {
+    "session_data": ".eJxVjDsOwyAQBe9CHSFYfkvK9D4DAhYFJxFIxq6i3D1CcpG0b2bem4V47DUco2xhJXZlwC6_W4r5WdoE9Ijt3nnubd_WxKfCTzr40qm8bqf7d1DjqLPWxSsZYwZJCMkmhxa90SSsA-NlBgRERcJIhaStyYaE8wmBkMBL9vkCwWY2lw:1ul5RG:LBsmHB-cw7x9rbVSgnyx2fYM7hx6FRQ4N6b5TT-PtEQ",
+    "expire_date": "2025-08-24T12:46:14.682Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "urdy91jkal90q8k5vr30n99wc32yxxz0",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGlnrTfwJJT1nsNbeNQ6gRIqTCnF3iJQC2jcz76UibWuNW5MljqzOyqrT75YoP2TaAd9pus06z9O6jEnvij5o09eZ5Xk53L-DSq1-a6S-FwM-YN8N6MRbkjKUAtARITIaQMQEYInEeydBvGEHOQUumUG9P8g9N7c:1ul25G:14rRqtzsq4AIZcqwtOogdk8c3CpyryBk8krxX6VjLKA",
+    "expire_date": "2025-08-24T09:11:18.266Z"
+  }
+},
+{
+  "model": "core.coquan",
+  "pk": 1,
+  "fields": {
+    "name": 

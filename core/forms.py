@@ -50,6 +50,7 @@ class NhiemVuForm(forms.ModelForm):
             'id_ke_hoach', 'id_nguoi_thuc_hien', 'id_nhiem_vu_cha',
             'thoi_gian_uoc_tinh',
             'is_recurring', 'recurring_frequency', 'recurring_until',
+            'is_quy_trinh_dac_biet', # Add the new field here
         ]
         widgets = {
             'ngay_bat_dau': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
@@ -64,6 +65,8 @@ class NhiemVuForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if not self.instance.pk: # Only set default for new instances
             self.initial['ngay_bat_dau'] = timezone.now()
+
+        self.fields['is_quy_trinh_dac_biet'].disabled = True
 
         # Filter id_nguoi_thuc_hien (assignee) based on assignment rules
         if self.request_user:
@@ -129,6 +132,20 @@ class NhiemVuForm(forms.ModelForm):
                 ).distinct() | KeHoach.objects.filter(
                     id_du_an__id_don_vi_chu_tri=self.request_user.phong_ban
                 ).distinct()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        assigner = self.request_user
+        assignee = cleaned_data.get('id_nguoi_thuc_hien')
+
+        if assigner and assignee:
+            is_special_workflow = (
+                assigner.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG and
+                assignee.role == CustomUser.Role.LANH_DAO_PHONG
+            )
+            cleaned_data['is_quy_trinh_dac_biet'] = is_special_workflow
+
+        return cleaned_data
 
 
 class BinhLuanForm(forms.ModelForm):
@@ -237,6 +254,25 @@ class GoiThauForm(forms.ModelForm):
         model = GoiThau
         fields = '__all__'
 
+from django.core.exceptions import ValidationError
+
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultipleFileField(forms.FileField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput)
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            result = [single_file_clean(d, initial) for d in data]
+        else:
+            result = single_file_clean(data, initial)
+        return result
+
 class ExtensionRequestForm(forms.ModelForm):
     class Meta:
         model = NhiemVu
@@ -244,3 +280,7 @@ class ExtensionRequestForm(forms.ModelForm):
         widgets = {
             'ngay_ket_thuc_de_xuat': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
+
+class NhiemVuCompletionForm(forms.Form):
+    attachments = MultipleFileField(required=False, label='Đính kèm tệp trả lời')
+    comment = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}), required=False, label='Bình luận / Trả lời')

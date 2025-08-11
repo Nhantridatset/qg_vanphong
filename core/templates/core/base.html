@@ -95,11 +95,11 @@
                 .then(data => {
                     const countSpan = document.getElementById('unread-notifications-count');
                     if (countSpan) {
-                        countSpan.textContent = data.count;
-                        if (data.count > 0) {
-                            countSpan.classList.remove('hidden', 'opacity-0');
+                        countSpan.textContent = data.unread_count;
+                        if (data.unread_count > 0) {
+                            countSpan.classList.remove('hidden');
                         } else {
-                            countSpan.classList.add('hidden', 'opacity-100');
+                            countSpan.classList.add('hidden');
                         }
                     }
                 })

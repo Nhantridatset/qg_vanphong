@@ -79,6 +79,28 @@
             isRecurringCheckbox.addEventListener('change', toggleRecurringFields);
             toggleRecurringFields(); // Initial call on page load
         }
+
+        // Logic for special workflow checkbox
+        const assigneeSelect = document.getElementById('id_id_nguoi_thuc_hien');
+        const specialWorkflowCheckbox = document.getElementById('id_is_quy_trinh_dac_biet');
+        const currentUserRole = "{{ request.user.role }}";
+
+        if (assigneeSelect && specialWorkflowCheckbox) {
+            assigneeSelect.addEventListener('change', function() {
+                const selectedUserId = this.value;
+                if (selectedUserId) {
+                    fetch(`/ajax/get-user-role/${selectedUserId}/`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (currentUserRole === 'CHUYEN_VIEN_VAN_PHONG' && data.role === 'LANH_DAO_PHONG') {
+                                specialWorkflowCheckbox.checked = true;
+                            } else {
+                                specialWorkflowCheckbox.checked = false;
+                            }
+                        });
+                }
+            });
+        }
     });
     </script>
 {% endblock %}

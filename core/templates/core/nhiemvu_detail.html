@@ -38,6 +38,12 @@
             <h2 class="text-lg font-semibold text-slate-700 mb-2">Thông tin thời gian</h2>
             <p class="text-slate-600"><strong>Thời gian ước tính:</strong> {{ object.thoi_gian_uoc_tinh|default:"N/A" }} giờ</p>
             <p class="text-slate-600"><strong>Thời gian thực tế:</strong> {{ object.thoi_gian_thuc_te|default:"N/A" }} giờ</p>
+            {% if object.ngay_hoan_thanh %}
+            <p class="text-slate-600"><strong>Ngày hoàn thành:</strong> {{ object.ngay_hoan_thanh|date:"d/m/Y H:i" }}</p>
+            {% endif %}
+            {% if object.hoan_thanh_vao_cuoi_tuan %}
+                <p class="text-sm text-red-600">Ghi chú: Hoàn thành vào ngày {{ object.ngay_hoan_thanh|date:"l" }}</p>
+            {% endif %}
         </div>
 
         {% if object.is_recurring %}
@@ -58,11 +64,11 @@
             {% endif %}
 
             {% if request.user.is_authenticated and object.id_nguoi_thuc_hien == request.user and object.trang_thai == 'ASSIGNED' %}
-                <button id="completeAndRateBtn" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors">Gửi duyệt</button>
+                <a href="{% url 'complete-and-rate-nhiemvu' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors">Gửi duyệt hoàn thành</a>
                 <a href="{% url 'request-extension' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 transition-colors">Xin gia hạn</a>
             {% endif %}
 
-            {% if request.user.is_authenticated and object.id_nguoi_giao_viec == request.user and object.trang_thai == 'PENDING_COMPLETION_APPROVAL' %}
+            {% if request.user.is_authenticated and request.user == object.completion_approver and object.trang_thai == 'PENDING_COMPLETION_APPROVAL' %}
                 <a href="{% url 'approve-completion-and-rate-nhiemvu' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition-colors">Phê duyệt hoàn thành & Chấm điểm</a>
             {% endif %}
 
@@ -114,20 +120,7 @@
     </div>
 </div>
 
-<!-- Submit for Approval Modal -->
-<div id="ratingModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Gửi duyệt hoàn thành Nhiệm vụ</h3>
-        <form method="post" action="{% url 'complete-and-rate-nhiemvu' object.pk %}">
-            {% csrf_token %}
-            <p class="text-slate-600 mb-4">Bạn có chắc chắn muốn gửi nhiệm vụ này để duyệt hoàn thành?</p>
-            <div class="flex justify-end space-x-3">
-                <button type="button" id="cancelRatingBtn" class="px-4 py-2 rounded-md text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors">Hủy</button>
-                <button type="submit" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">Gửi duyệt</button>
-            </div>
-        </form>
-    </div>
-</div>
+
 
 <script>
 // Simple script to add Tailwind classes to the comment form
@@ -140,28 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
         textarea.setAttribute('placeholder', 'Nhập bình luận của bạn...');
     }
 
-    // Rating Modal Logic
-    const completeAndRateBtn = document.getElementById('completeAndRateBtn');
-    const ratingModal = document.getElementById('ratingModal');
-    const cancelRatingBtn = document.getElementById('cancelRatingBtn');
-
-    if (completeAndRateBtn) {
-        completeAndRateBtn.addEventListener('click', () => {
-            ratingModal.classList.remove('hidden');
-        });
-    }
-
-    if (cancelRatingBtn) {
-        cancelRatingBtn.addEventListener('click', () => {
-            ratingModal.classList.add('hidden');
-        });
-    }
-
-    ratingModal.addEventListener('click', (e) => {
-        if (e.target === ratingModal) {
-            ratingModal.classList.add('hidden');
-        }
-    });
+    
 });
 </script>
 {% endblock %}

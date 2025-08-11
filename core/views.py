@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse, FileResponse, HttpResponse, HttpResponseForbidden, Http404 # Dùng để trả về file Excel
 import io # Dùng để làm việc với file trong bộ nhớ
@@ -24,13 +25,21 @@ from .models import (
 # Assuming forms exist in core/forms.py
 from .forms import (
     CoQuanForm, PhongBanForm, HoSoCongViecForm, KeHoachForm, MocThoiGianForm,
-    NhiemVuForm, TepDinhKemForm, LichSuCongViecForm, CustomReportForm, TaskHandoverForm, ExtensionRequestForm, BinhLuanForm
+    NhiemVuForm, TepDinhKemForm, LichSuCongViecForm, CustomReportForm, TaskHandoverForm, ExtensionRequestForm, BinhLuanForm, NhiemVuCompletionForm
 )
 
 from datetime import date, timedelta, datetime
-from django.utils.timezone import now
-from .utils import create_notification # Import the utility function
+from django.utils import timezone
+from .utils import create_notification, calculate_business_hours # Import the utility function
 import json # For parsing JSON in update_task_date_from_calendar
+
+@login_required
+def get_user_role(request, user_id):
+    try:
+        user = CustomUser.objects.get(pk=user_id)
+        return JsonResponse({'role': user.role})
+    except CustomUser.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
 
 def home(request):
     return render(request, 'core/home.html')
@@ -88,13 +97,36 @@ def dashboard(request):
     context['tasks_due_in_one_day'] = base_tasks_queryset.filter(
         ngay_ket_thuc__date=tomorrow,
         trang_thai__in=[NhiemVu.TrangThai.PENDING_ASSIGNMENT_APPROVAL, NhiemVu.TrangThai.ASSIGNED, NhiemVu.TrangThai.PENDING_COMPLETION_APPROVAL]
-    )
+    ).order_by('ngay_ket_thuc')
 
     context['upcoming_tasks'] = base_tasks_queryset.filter(
         ngay_ket_thuc__gte=today,
         ngay_ket_thuc__date__gt=tomorrow, # Exclude tasks due tomorrow
         trang_thai__in=[NhiemVu.TrangThai.PENDING_ASSIGNMENT_APPROVAL, NhiemVu.TrangThai.ASSIGNED, NhiemVu.TrangThai.PENDING_COMPLETION_APPROVAL]
-    ).order_by('-ngay_ket_thuc') # Sort by remaining days in descending order
+    ).order_by('ngay_ket_thuc') # Sort by remaining days in ascending order
+
+    # Query for tasks needing approval
+    pending_assignment_tasks = NhiemVu.objects.none()
+    pending_completion_tasks = NhiemVu.objects.none()
+
+    if user.role in [CustomUser.Role.LANH_DAO_CO_QUAN, CustomUser.Role.LANH_DAO_VAN_PHONG]:
+        pending_assignment_tasks = NhiemVu.objects.filter(
+            trang_thai=NhiemVu.TrangThai.PENDING_ASSIGNMENT_APPROVAL
+        )
+        # Further filter by agency/department if applicable
+        if user.role == CustomUser.Role.LANH_DAO_VAN_PHONG and user.phong_ban and user.phong_ban.co_quan:
+            pending_assignment_tasks = pending_assignment_tasks.filter(id_phong_ban_lien_quan__co_quan=user.phong_ban.co_quan)
+
+    # For completion approval, the approver is specific to the task
+    pending_completion_tasks = NhiemVu.objects.filter(
+        trang_thai=NhiemVu.TrangThai.PENDING_COMPLETION_APPROVAL
+    ).filter(
+        Q(is_quy_trinh_dac_biet=True, id_nguoi_duyet_giao_viec=user) |
+        Q(is_quy_trinh_dac_biet=False, id_nguoi_giao_viec=user)
+    )
+
+    context['pending_assignment_tasks'] = pending_assignment_tasks
+    context['pending_completion_tasks'] = pending_completion_tasks
 
     return render(request, 'core/dashboard.html', context)
 
@@ -250,26 +282,53 @@ def complete_and_rate_nhiemvu_view(request, pk):
         return redirect('nhiemvu-detail', pk=pk)
 
     if request.method == 'POST':
-        nhiemvu.trang_thai = NhiemVu.TrangThai.PENDING_COMPLETION_APPROVAL # Change status to PENDING_COMPLETION_APPROVAL
-        nhiemvu.save()
-        messages.success(request, _(f'Nhiệm vụ "{nhiemvu.ten_nhiem_vu}" đã được gửi duyệt hoàn thành.')) # Update message
+        form = NhiemVuCompletionForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Handle file uploads
+            for f in request.FILES.getlist('attachments'):
+                TepDinhKem.objects.create(
+                    file=f,
+                    uploader=request.user,
+                    nhiem_vu=nhiemvu
+                )
 
-        # Add audit log entry
-        LichSuCongViec.objects.create(
-            nhiem_vu=nhiemvu,
-            user=request.user,
-            mo_ta="Gửi duyệt hoàn thành nhiệm vụ",
-            details={
-                "trang_thai_cu": nhiemvu.trang_thai,
-                "trang_thai_moi": NhiemVu.TrangThai.PENDING_COMPLETION_APPROVAL,
-                "nguoi_gui_duyet": request.user.username,
-            }
-        )
-        # Send notification to assigner
-        message_to_assigner = f"Nhiệm vụ '{nhiemvu.ten_nhiem_vu}' đã được gửi duyệt hoàn thành bởi {request.user.username}."
-        create_notification(nhiemvu.id_nguoi_giao_viec, message_to_assigner, related_task=nhiemvu)
+            # Add comment if provided
+            comment_text = form.cleaned_data.get('comment')
+            if comment_text:
+                BinhLuan.objects.create(
+                    nhiem_vu=nhiemvu,
+                    user=request.user,
+                    noi_dung=comment_text
+                )
 
-    return redirect('nhiemvu-detail', pk=pk)
+            nhiemvu.trang_thai = NhiemVu.TrangThai.PENDING_COMPLETION_APPROVAL
+            nhiemvu.save()
+            messages.success(request, _(f'Nhiệm vụ "{nhiemvu.ten_nhiem_vu}" đã được gửi duyệt hoàn thành.'))
+
+            # Add audit log entry
+            LichSuCongViec.objects.create(
+                nhiem_vu=nhiemvu,
+                user=request.user,
+                mo_ta="Gửi duyệt hoàn thành nhiệm vụ",
+                details={
+                    "trang_thai_cu": nhiemvu.trang_thai,
+                    "trang_thai_moi": NhiemVu.TrangThai.PENDING_COMPLETION_APPROVAL,
+                    "nguoi_gui_duyet": request.user.username,
+                }
+            )
+            # Send notification to assigner
+            message_to_assigner = f"Nhiệm vụ '{nhiemvu.ten_nhiem_vu}' đã được gửi duyệt hoàn thành bởi {request.user.username}."
+            create_notification(nhiemvu.id_nguoi_giao_viec, message_to_assigner, related_task=nhiemvu)
+
+            return redirect('nhiemvu-detail', pk=pk)
+    else:
+        form = NhiemVuCompletionForm()
+
+    context = {
+        'nhiemvu': nhiemvu,
+        'form': form
+    }
+    return render(request, 'core/nhiemvu_completion_form.html', context)
 
 @login_required
 def approve_assignment_view(request, pk):
@@ -289,6 +348,7 @@ def approve_assignment_view(request, pk):
 
     if request.method == 'POST':
         nhiemvu.trang_thai = NhiemVu.TrangThai.ASSIGNED
+        nhiemvu.id_nguoi_duyet_giao_viec = request.user  # Save the approver
         nhiemvu.save()
         messages.success(request, f"Đã phê duyệt giao nhiệm vụ '{nhiemvu.ten_nhiem_vu}' thành công!")
         
@@ -319,8 +379,8 @@ def approve_assignment_view(request, pk):
 def approve_completion_and_rate_nhiemvu_view(request, pk):
     nhiemvu = get_object_or_404(NhiemVu, pk=pk)
 
-    # Check if the current user is the assigner
-    if nhiemvu.id_nguoi_giao_viec != request.user:
+    # Check if the current user is the designated approver
+    if request.user != nhiemvu.completion_approver:
         messages.error(request, "Bạn không có quyền phê duyệt và chấm điểm nhiệm vụ này.")
         return redirect('nhiemvu-detail', pk=pk)
 
@@ -336,6 +396,12 @@ def approve_completion_and_rate_nhiemvu_view(request, pk):
         nhiemvu.trang_thai = NhiemVu.TrangThai.COMPLETED
         nhiemvu.danh_gia_sao = rating
         nhiemvu.loi_danh_gia = review
+        nhiemvu.ngay_hoan_thanh = timezone.now() # Set completion date
+        
+        # Calculate actual business hours
+        if nhiemvu.ngay_bat_dau and nhiemvu.ngay_hoan_thanh:
+            nhiemvu.thoi_gian_thuc_te = calculate_business_hours(nhiemvu.ngay_bat_dau, nhiemvu.ngay_hoan_thanh)
+
         nhiemvu.save()
 
         messages.success(request, f"Đã phê duyệt hoàn thành và chấm điểm nhiệm vụ '{nhiemvu.ten_nhiem_vu}' thành công!")
@@ -940,6 +1006,34 @@ class NhiemVuUpdateView(LoginRequiredMixin, UpdateView):
         return kwargs
 
     def form_valid(self, form):
+        # Logic to handle status changes on update, similar to CreateView
+        original_instance = self.get_object()
+        new_instance = form.save(commit=False)
+
+        # Determine initial status based on assignment rules
+        assignee = new_instance.id_nguoi_thuc_hien
+
+        # Check if assignee is a Super Admin
+        if assignee.role == CustomUser.Role.LANH_DAO_CO_QUAN:
+            messages.error(self.request, "Không thể giao việc cho vai trò Lãnh đạo Cơ quan.")
+            return self.form_invalid(form)
+
+        # If the assignee or special status changes, re-evaluate the task status
+        if self.request.user.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG and \
+           assignee.role == CustomUser.Role.LANH_DAO_PHONG:
+            new_instance.trang_thai = NhiemVu.TrangThai.PENDING_ASSIGNMENT_APPROVAL
+            # Reset assignment approver if the flow changes back to pending
+            new_instance.id_nguoi_duyet_giao_viec = None
+        else:
+            # If it's not the special flow, it becomes ASSIGNED directly
+            new_instance.trang_thai = NhiemVu.TrangThai.ASSIGNED
+            # A non-special-flow task has no separate assignment approver
+            new_instance.id_nguoi_duyet_giao_viec = None
+
+        # Set id_phong_ban_lien_quan based on assignee's department
+        if assignee.phong_ban:
+            new_instance.id_phong_ban_lien_quan = assignee.phong_ban
+
         response = super().form_valid(form)
 
         # Handle file uploads
@@ -947,7 +1041,7 @@ class NhiemVuUpdateView(LoginRequiredMixin, UpdateView):
             TepDinhKem.objects.create(
                 file=f,
                 uploader=self.request.user,
-                nhiem_vu=form.instance
+                nhiem_vu=self.object
             )
         messages.success(self.request, "Nhiệm vụ và tệp đính kèm đã được cập nhật thành công!")
 
