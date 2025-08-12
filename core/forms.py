@@ -47,16 +47,18 @@ class NhiemVuForm(forms.ModelForm):
         fields = [
             'ten_nhiem_vu', 'mo_ta', 'muc_do_uu_tien',
             'ngay_bat_dau', 'ngay_ket_thuc',
-            'id_ke_hoach', 'id_nguoi_thuc_hien', 'id_nhiem_vu_cha',
+            'id_ke_hoach', 'id_nguoi_xu_ly_chinh', 'nguoi_dong_xu_ly', 'id_nhiem_vu_cha',
             'thoi_gian_uoc_tinh',
             'is_recurring', 'recurring_frequency', 'recurring_until',
-            'is_quy_trinh_dac_biet', # Add the new field here
+            # 'is_quy_trinh_dac_biet', # Removed from form as it's an internal flag
         ]
         widgets = {
             'ngay_bat_dau': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'ngay_ket_thuc': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'thoi_gian_uoc_tinh': forms.NumberInput(attrs={'step': '0.5', 'min': '0'}),
             'recurring_until': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'id_nguoi_xu_ly_chinh': forms.Select(attrs={'class': 'select2-single'}),
+            'nguoi_dong_xu_ly': forms.SelectMultiple(attrs={'class': 'select2-multiple'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -66,45 +68,40 @@ class NhiemVuForm(forms.ModelForm):
         if not self.instance.pk: # Only set default for new instances
             self.initial['ngay_bat_dau'] = timezone.now()
 
-        self.fields['is_quy_trinh_dac_biet'].disabled = True
+        # self.fields['is_quy_trinh_dac_biet'].disabled = True # Removed as field is no longer in form
 
-        # Filter id_nguoi_thuc_hien (assignee) based on assignment rules
+        # Filter id_nguoi_xu_ly_chinh (main assignee) based on assignment rules
         if self.request_user:
             if self.request_user.role == CustomUser.Role.LANH_DAO_CO_QUAN:
-                # Super Admin can assign to anyone except themselves, and not to other Super Admins
-                self.fields['id_nguoi_thuc_hien'].queryset = CustomUser.objects.exclude(pk=self.request_user.pk).exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
+                self.fields['id_nguoi_xu_ly_chinh'].queryset = CustomUser.objects.exclude(pk=self.request_user.pk).exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
             elif self.request_user.role == CustomUser.Role.LANH_DAO_VAN_PHONG:
-                # Lanh dao Van phong can assign to Lanh dao Phong and Chuyen vien Van phong
-                self.fields['id_nguoi_thuc_hien'].queryset = CustomUser.objects.filter(
+                self.fields['id_nguoi_xu_ly_chinh'].queryset = CustomUser.objects.filter(
                     role__in=[
                         CustomUser.Role.LANH_DAO_PHONG,
                         CustomUser.Role.CHUYEN_VIEN_VAN_PHONG
                     ]
                 ).exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
             elif self.request_user.role == CustomUser.Role.LANH_DAO_PHONG:
-                # Lanh dao Phong can assign to Chuyen vien Phong and other Lanh dao Phong in their department
                 if self.request_user.phong_ban:
-                    self.fields['id_nguoi_thuc_hien'].queryset = CustomUser.objects.filter(
+                    self.fields['id_nguoi_xu_ly_chinh'].queryset = CustomUser.objects.filter(
                         phong_ban=self.request_user.phong_ban,
                         role__in=[CustomUser.Role.CHUYEN_VIEN_PHONG, CustomUser.Role.LANH_DAO_PHONG]
                     ).exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
                 else:
-                    self.fields['id_nguoi_thuc_hien'].queryset = CustomUser.objects.none()
+                    self.fields['id_nguoi_xu_ly_chinh'].queryset = CustomUser.objects.none()
             elif self.request_user.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG:
-                # Chuyen vien Van phong can assign to Lanh dao Phong (special approval flow)
-                # and also to themselves.
-                self.fields['id_nguoi_thuc_hien'].queryset = CustomUser.objects.filter(
+                self.fields['id_nguoi_xu_ly_chinh'].queryset = CustomUser.objects.filter(
                     Q(role=CustomUser.Role.LANH_DAO_PHONG) | Q(pk=self.request_user.pk)
                 ).exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
             elif self.request_user.role == CustomUser.Role.CHUYEN_VIEN_PHONG:
-                # Chuyen vien Phong can only assign to themselves
-                self.fields['id_nguoi_thuc_hien'].queryset = CustomUser.objects.filter(pk=self.request_user.pk).exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
-            elif self.request_user.role == CustomUser.Role.CHUYEN_VIEN:
-                # Chuyen vien can only assign to themselves
-                self.fields['id_nguoi_thuc_hien'].queryset = CustomUser.objects.filter(pk=self.request_user.pk).exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
+                self.fields['id_nguoi_xu_ly_chinh'].queryset = CustomUser.objects.filter(pk=self.request_user.pk).exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
             else:
-                # Default: no assignment or specific roles
-                self.fields['id_nguoi_thuc_hien'].queryset = CustomUser.objects.none().exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
+                self.fields['id_nguoi_xu_ly_chinh'].queryset = CustomUser.objects.none().exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
+
+            # Filter nguoi_dong_xu_ly (co-assignees) - allow all users except LANH_DAO_CO_QUAN and the main assignee
+            self.fields['nguoi_dong_xu_ly'].queryset = CustomUser.objects.exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
+            if self.instance and self.instance.id_nguoi_xu_ly_chinh:
+                self.fields['nguoi_dong_xu_ly'].queryset = self.fields['nguoi_dong_xu_ly'].queryset.exclude(pk=self.instance.id_nguoi_xu_ly_chinh.pk)
 
             # Filter id_ke_hoach (plan) based on user's role and associated projects/departments
             if self.request_user.role == CustomUser.Role.LANH_DAO_CO_QUAN:
@@ -128,7 +125,7 @@ class NhiemVuForm(forms.ModelForm):
             else:
                 # Chuyen vien only sees plans related to tasks assigned to them or their department
                 self.fields['id_ke_hoach'].queryset = KeHoach.objects.filter(
-                    nhiem_vu__id_nguoi_thuc_hien=self.request_user
+                    nhiem_vu__id_nguoi_xu_ly_chinh=self.request_user
                 ).distinct() | KeHoach.objects.filter(
                     id_du_an__id_don_vi_chu_tri=self.request_user.phong_ban
                 ).distinct()
@@ -136,12 +133,16 @@ class NhiemVuForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         assigner = self.request_user
-        assignee = cleaned_data.get('id_nguoi_thuc_hien')
+        main_assignee = cleaned_data.get('id_nguoi_xu_ly_chinh')
+        co_assignees = cleaned_data.get('nguoi_dong_xu_ly')
 
-        if assigner and assignee:
+        if main_assignee and co_assignees and main_assignee in co_assignees:
+            raise forms.ValidationError("Người xử lý chính không thể đồng thời là người đồng xử lý.")
+
+        if assigner and main_assignee:
             is_special_workflow = (
                 assigner.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG and
-                assignee.role == CustomUser.Role.LANH_DAO_PHONG
+                main_assignee.role == CustomUser.Role.LANH_DAO_PHONG
             )
             cleaned_data['is_quy_trinh_dac_biet'] = is_special_workflow
 

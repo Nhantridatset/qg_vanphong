@@ -20,7 +20,7 @@ msgstr ""
 
 #: .\core\templates\core\base.html:7 .\core\templates\core\base.html:15
 msgid "qg_vanphong"
-msgstr "Văn phòng QG"
+msgstr "văn phòng điện tử"
 
 #: .\core\templates\core\base.html:19
 msgid "Admin"

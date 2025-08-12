@@ -12,6 +12,9 @@
             font-family: 'Inter', sans-serif;
         }
     </style>
+    {% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/select2_custom.css' %}">
+{% endblock %}
 </head>
 <body class="bg-slate-100 text-slate-800">
     <nav class="bg-white shadow-md">
@@ -69,6 +72,8 @@
         </div>
     </div>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    {% block extra_js %}{% endblock %}
     <script>
         const aiSuggestionModal = document.getElementById('aiSuggestionModal');
         const closeModalButton = document.getElementById('closeModal');

@@ -87,8 +87,8 @@ def dashboard(request):
                 'department_tasks': NhiemVu.objects.none()
             })
     elif user.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG or user.role == CustomUser.Role.CHUYEN_VIEN_PHONG:
-        base_tasks_queryset = NhiemVu.objects.filter(id_nguoi_thuc_hien=user) | NhiemVu.objects.filter(id_nguoi_giao_viec=user)
-        context['assigned_tasks'] = NhiemVu.objects.filter(id_nguoi_thuc_hien=user) # Keep for CHUYEN_VIEN
+        base_tasks_queryset = NhiemVu.objects.filter(Q(id_nguoi_xu_ly_chinh=user) | Q(id_nguoi_giao_viec=user) | Q(nguoi_dong_xu_ly=user)).distinct()
+        context['assigned_tasks'] = NhiemVu.objects.filter(Q(id_nguoi_xu_ly_chinh=user) | Q(nguoi_dong_xu_ly=user)).distinct() # Keep for CHUYEN_VIEN
     else:
         base_tasks_queryset = NhiemVu.objects.none()
 
@@ -105,19 +105,47 @@ def dashboard(request):
         trang_thai__in=[NhiemVu.TrangThai.PENDING_ASSIGNMENT_APPROVAL, NhiemVu.TrangThai.ASSIGNED, NhiemVu.TrangThai.PENDING_COMPLETION_APPROVAL]
     ).order_by('ngay_ket_thuc') # Sort by remaining days in ascending order
 
-    # Query for tasks needing approval
+    # Query for items needing assignment approval
     pending_assignment_tasks = NhiemVu.objects.none()
-    pending_completion_tasks = NhiemVu.objects.none()
+    pending_assignment_hosocongviec = HoSoCongViec.objects.none()
+    pending_assignment_kehoach = KeHoach.objects.none()
 
-    if user.role in [CustomUser.Role.LANH_DAO_CO_QUAN, CustomUser.Role.LANH_DAO_VAN_PHONG]:
-        pending_assignment_tasks = NhiemVu.objects.filter(
-            trang_thai=NhiemVu.TrangThai.PENDING_ASSIGNMENT_APPROVAL
-        )
-        # Further filter by agency/department if applicable
-        if user.role == CustomUser.Role.LANH_DAO_VAN_PHONG and user.phong_ban and user.phong_ban.co_quan:
-            pending_assignment_tasks = pending_assignment_tasks.filter(id_phong_ban_lien_quan__co_quan=user.phong_ban.co_quan)
+    if user.role == CustomUser.Role.LANH_DAO_CO_QUAN:
+        pending_assignment_tasks = NhiemVu.objects.filter(trang_thai=NhiemVu.TrangThai.PENDING_ASSIGNMENT_APPROVAL)
+        pending_assignment_hosocongviec = HoSoCongViec.objects.filter(trang_thai=HoSoCongViec.TrangThai.CHO_PHE_DUYET)
+        # For KeHoach, if LANH_DAO_CO_QUAN can approve initial plans
+        pending_assignment_kehoach = KeHoach.objects.filter(trang_thai=KeHoach.TrangThai.CHUA_BAT_DAU)
+    elif user.role == CustomUser.Role.LANH_DAO_VAN_PHONG:
+        if user.phong_ban and user.phong_ban.co_quan:
+            pending_assignment_tasks = NhiemVu.objects.filter(
+                trang_thai=NhiemVu.TrangThai.PENDING_ASSIGNMENT_APPROVAL,
+                id_phong_ban_lien_quan__co_quan=user.phong_ban.co_quan
+            )
+            pending_assignment_hosocongviec = HoSoCongViec.objects.filter(
+                trang_thai=HoSoCongViec.TrangThai.CHO_PHE_DUYET,
+                id_don_vi_chu_tri__co_quan=user.phong_ban.co_quan
+            )
+            # For KeHoach, if LANH_DAO_VAN_PHONG can approve initial plans within their agency
+            pending_assignment_kehoach = KeHoach.objects.filter(
+                trang_thai=KeHoach.TrangThai.CHUA_BAT_DAU,
+                id_don_vi_thuc_hien__co_quan=user.phong_ban.co_quan
+            )
+    elif user.role == CustomUser.Role.LANH_DAO_PHONG:
+        if user.phong_ban:
+            # Lãnh đạo Phòng approves NhiemVu within their department
+            pending_assignment_tasks = NhiemVu.objects.filter(
+                trang_thai=NhiemVu.TrangThai.PENDING_ASSIGNMENT_APPROVAL,
+                id_phong_ban_lien_quan=user.phong_ban
+            )
+            # Lãnh đạo Phòng approves KeHoach within their department
+            pending_assignment_kehoach = KeHoach.objects.filter(
+                trang_thai=KeHoach.TrangThai.CHUA_BAT_DAU,
+                id_don_vi_thuc_hien=user.phong_ban
+            )
+            # HoSoCongViec is approved by LANH_DAO_CO_QUAN, so LANH_DAO_PHONG won't see it here for assignment approval.
+            # If they need to see it, the logic for HoSoCongViec approval needs to be adjusted.
 
-    # For completion approval, the approver is specific to the task
+    # For completion approval, the approver is specific to the task (NhiemVu only for now)
     pending_completion_tasks = NhiemVu.objects.filter(
         trang_thai=NhiemVu.TrangThai.PENDING_COMPLETION_APPROVAL
     ).filter(
@@ -126,6 +154,8 @@ def dashboard(request):
     )
 
     context['pending_assignment_tasks'] = pending_assignment_tasks
+    context['pending_assignment_hosocongviec'] = pending_assignment_hosocongviec
+    context['pending_assignment_kehoach'] = pending_assignment_kehoach
     context['pending_completion_tasks'] = pending_completion_tasks
 
     return render(request, 'core/dashboard.html', context)
@@ -210,6 +240,18 @@ def get_unread_notifications_count(request):
     count = Notification.objects.filter(user=request.user, is_read=False).count()
     return JsonResponse({'unread_count': count})
 
+@login_required
+def get_users_for_autocomplete(request):
+    search_term = request.GET.get('q', '')
+    users = CustomUser.objects.filter(
+        Q(username__icontains=search_term) | Q(first_name__icontains=search_term) | Q(last_name__icontains=search_term)
+    ).exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN).order_by('username')[:10] # Limit to 10 results
+
+    results = []
+    for user in users:
+        results.append({'id': user.pk, 'text': user.get_full_name() or user.username})
+    return JsonResponse({'results': results})
+
 @require_POST
 @login_required
 def update_task_date_from_calendar(request):
@@ -249,18 +291,24 @@ def task_handover_view(request):
 def approve_hosocongviec_view(request, pk):
     hosocongviec = get_object_or_404(HoSoCongViec, pk=pk)
     if request.method == 'POST':
-        hosocongviec.trang_thai = HoSoCongViec.TrangThai.DA_DUYET
-        hosocongviec.save()
-        messages.success(request, _(f'Hồ sơ công việc "{hosocongviec.ten_ho_so_cong_viec}" đã được phê duyệt.'))
+        if request.user.role == CustomUser.Role.LANH_DAO_CO_QUAN:
+            hosocongviec.trang_thai = HoSoCongViec.TrangThai.DA_DUYET
+            hosocongviec.save()
+            messages.success(request, _(f'Hồ sơ công việc "{hosocongviec.ten_ho_so_cong_viec}" đã được phê duyệt.'))
+        else:
+            messages.error(request, _('Bạn không có quyền phê duyệt Hồ sơ công việc này.'))
     return redirect('hosocongviec-list')
 
 @login_required
 def approve_kehoach_view(request, pk):
     kehoach = get_object_or_404(KeHoach, pk=pk)
     if request.method == 'POST':
-        kehoach.trang_thai = KeHoach.TrangThai.DA_DUYET
-        kehoach.save()
-        messages.success(request, _(f'Kế hoạch "{kehoach.ten_ke_hoach}" đã được phê duyệt.'))
+        if request.user.role == CustomUser.Role.LANH_DAO_PHONG:
+            kehoach.trang_thai = KeHoach.TrangThai.DA_DUYET
+            kehoach.save()
+            messages.success(request, _(f'Kế hoạch "{kehoach.ten_ke_hoach}" đã được phê duyệt.'))
+        else:
+            messages.error(request, _('Bạn không có quyền phê duyệt Kế hoạch này.'))
     return redirect('kehoach-list')
 
 @login_required
@@ -276,8 +324,8 @@ def approve_nhiemvu_view(request, pk):
 def complete_and_rate_nhiemvu_view(request, pk):
     nhiemvu = get_object_or_404(NhiemVu, pk=pk)
 
-    # Check if the current user is the assignee
-    if nhiemvu.id_nguoi_thuc_hien != request.user:
+    # Check if the current user is the main assignee
+    if nhiemvu.id_nguoi_xu_ly_chinh != request.user:
         messages.error(request, "Bạn không có quyền thực hiện hành động này.")
         return redirect('nhiemvu-detail', pk=pk)
 
@@ -368,7 +416,7 @@ def approve_assignment_view(request, pk):
         create_notification(nhiemvu.id_nguoi_giao_viec, message_to_assigner, related_task=nhiemvu)
 
         message_to_assignee = f"Nhiệm vụ '{nhiemvu.ten_nhiem_vu}' đã được phê duyệt và giao cho bạn."
-        create_notification(nhiemvu.id_nguoi_thuc_hien, message_to_assignee, related_task=nhiemvu)
+        create_notification(nhiemvu.id_nguoi_xu_ly_chinh, message_to_assignee, related_task=nhiemvu)
 
         return redirect('nhiemvu-detail', pk=pk)
 
@@ -400,7 +448,12 @@ def approve_completion_and_rate_nhiemvu_view(request, pk):
         
         # Calculate actual business hours
         if nhiemvu.ngay_bat_dau and nhiemvu.ngay_hoan_thanh:
-            nhiemvu.thoi_gian_thuc_te = calculate_business_hours(nhiemvu.ngay_bat_dau, nhiemvu.ngay_hoan_thanh)
+            print(f"DEBUG: ngay_bat_dau: {nhiemvu.ngay_bat_dau}, ngay_hoan_thanh: {nhiemvu.ngay_hoan_thanh}")
+            calculated_time = calculate_business_hours(nhiemvu.ngay_bat_dau, nhiemvu.ngay_hoan_thanh)
+            nhiemvu.thoi_gian_thuc_te = calculated_time
+            print(f"DEBUG: Calculated thoi_gian_thuc_te: {calculated_time}")
+        else:
+            print(f"DEBUG: Cannot calculate thoi_gian_thuc_te. ngay_bat_dau: {nhiemvu.ngay_bat_dau}, ngay_hoan_thanh: {nhiemvu.ngay_hoan_thanh}")
 
         nhiemvu.save()
 
@@ -421,7 +474,7 @@ def approve_completion_and_rate_nhiemvu_view(request, pk):
         )
         # Send notification to assignee
         message_to_assignee = f"Nhiệm vụ '{nhiemvu.ten_nhiem_vu}' của bạn đã được phê duyệt hoàn thành và chấm điểm."
-        create_notification(nhiemvu.id_nguoi_thuc_hien, message_to_assignee, related_task=nhiemvu)
+        create_notification(nhiemvu.id_nguoi_xu_ly_chinh, message_to_assignee, related_task=nhiemvu)
 
         return redirect('nhiemvu-detail', pk=pk)
 
@@ -436,8 +489,8 @@ def approve_completion_and_rate_nhiemvu_view(request, pk):
 def request_extension_view(request, pk):
     nhiemvu = get_object_or_404(NhiemVu, pk=pk)
 
-    # Check if the current user is the assignee of the task
-    if nhiemvu.id_nguoi_thuc_hien != request.user:
+    # Check if the current user is the main assignee of the task
+    if nhiemvu.id_nguoi_xu_ly_chinh != request.user:
         messages.error(request, "Bạn không có quyền yêu cầu gia hạn cho nhiệm vụ này.")
         return redirect('nhiemvu-detail', pk=pk)
 
@@ -865,9 +918,9 @@ class NhiemVuListView(LoginRequiredMixin, ListView):
                 return NhiemVu.objects.filter(id_phong_ban_lien_quan=user.phong_ban)
             else:
                 return NhiemVu.objects.none()
-        elif user.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG or user.role == CustomUser.Role.CHUYEN_VIEN_PHONG or user.role == CustomUser.Role.CHUYEN_VIEN:
-            # Chuyên viên (Personal View): Chỉ thấy nhiệm vụ của bản thân (người thực hiện hoặc người giao việc).
-            return NhiemVu.objects.filter(id_nguoi_thuc_hien=user) | NhiemVu.objects.filter(id_nguoi_giao_viec=user)
+        elif user.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG or user.role == CustomUser.Role.CHUYEN_VIEN_PHONG:
+            # Chuyên viên (Personal View): Chỉ thấy nhiệm vụ của bản thân (người xử lý chính hoặc người giao việc hoặc người đồng xử lý).
+            return NhiemVu.objects.filter(Q(id_nguoi_xu_ly_chinh=user) | Q(id_nguoi_giao_viec=user) | Q(nguoi_dong_xu_ly=user)).distinct()
         else:
             return NhiemVu.objects.none()
 class NhiemVuDetailView(LoginRequiredMixin, DetailView):
@@ -894,8 +947,8 @@ class NhiemVuDetailView(LoginRequiredMixin, DetailView):
             else:
                 raise Http404("Nhiệm vụ không tồn tại hoặc bạn không có quyền truy cập.")
         elif user.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG or user.role == CustomUser.Role.CHUYEN_VIEN_PHONG:
-            # Chuyên viên (Personal View): Chỉ thấy nhiệm vụ của bản thân (người thực hiện hoặc người giao việc).
-            if obj.id_nguoi_thuc_hien == user or obj.id_nguoi_giao_viec == user:
+            # Chuyên viên (Personal View): Chỉ thấy nhiệm vụ của bản thân (người xử lý chính hoặc người giao việc hoặc người đồng xử lý).
+            if obj.id_nguoi_xu_ly_chinh == user or obj.id_nguoi_giao_viec == user or user in obj.nguoi_dong_xu_ly.all():
                 pass
             else:
                 raise Http404("Nhiệm vụ không tồn tại hoặc bạn không có quyền truy cập.")
@@ -940,26 +993,41 @@ class NhiemVuCreateView(LoginRequiredMixin, CreateView):
         form.instance.id_nguoi_tao = self.request.user
         form.instance.id_nguoi_giao_viec = self.request.user
 
-        # Determine initial status based on assignment rules
-        assignee = form.cleaned_data['id_nguoi_thuc_hien']
+        # Ensure ngay_bat_dau is set and timezone-aware
+        if not form.instance.ngay_bat_dau:
+            form.instance.ngay_bat_dau = timezone.now()
+        else:
+            # Make it timezone-aware if it's naive (from form input)
+            if form.instance.ngay_bat_dau.tzinfo is None:
+                form.instance.ngay_bat_dau = timezone.make_aware(form.instance.ngay_bat_dau)
 
-        # Check if assignee is a Super Admin
-        if assignee.role == CustomUser.Role.LANH_DAO_CO_QUAN:
+        # Make ngay_ket_thuc timezone-aware if it's naive
+        if form.instance.ngay_ket_thuc and form.instance.ngay_ket_thuc.tzinfo is None:
+            form.instance.ngay_ket_thuc = timezone.make_aware(form.instance.ngay_ket_thuc)
+
+        # Determine initial status based on assignment rules
+        main_assignee = form.cleaned_data['id_nguoi_xu_ly_chinh']
+        co_assignees = form.cleaned_data['nguoi_dong_xu_ly']
+
+        # Check if main_assignee is a Super Admin
+        if main_assignee.role == CustomUser.Role.LANH_DAO_CO_QUAN:
             messages.error(self.request, "Không thể giao việc cho vai trò Lãnh đạo Cơ quan.")
             return self.form_invalid(form)
 
         if self.request.user.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG and \
-           assignee.role == CustomUser.Role.LANH_DAO_PHONG:
+           main_assignee.role == CustomUser.Role.LANH_DAO_PHONG:
             form.instance.trang_thai = NhiemVu.TrangThai.PENDING_ASSIGNMENT_APPROVAL
         else:
-            # As per UI/UX requirement 5.2: default status is 'Đang thực hiện' (ASSIGNED)
             form.instance.trang_thai = NhiemVu.TrangThai.ASSIGNED
 
-        # Set id_phong_ban_lien_quan based on assignee's department
-        if assignee.phong_ban:
-            form.instance.id_phong_ban_lien_quan = assignee.phong_ban
+        # Set id_phong_ban_lien_quan based on main_assignee's department
+        if main_assignee.phong_ban:
+            form.instance.id_phong_ban_lien_quan = main_assignee.phong_ban
 
         response = super().form_valid(form)
+
+        # Save many-to-many relationship for co_assignees
+        form.instance.nguoi_dong_xu_ly.set(co_assignees)
 
         # Handle file uploads
         for f in self.request.FILES.getlist('attachments'):
@@ -979,7 +1047,8 @@ class NhiemVuCreateView(LoginRequiredMixin, CreateView):
                 "trang_thai_ban_dau": form.instance.trang_thai,
                 "nguoi_tao": self.request.user.username,
                 "nguoi_giao_viec": form.instance.id_nguoi_giao_viec.username,
-                "nguoi_thuc_hien": form.instance.id_nguoi_thuc_hien.username,
+                "nguoi_xu_ly_chinh": form.instance.id_nguoi_xu_ly_chinh.username,
+                "nguoi_dong_xu_ly": [user.username for user in form.instance.nguoi_dong_xu_ly.all()],
             }
         )
 
@@ -992,6 +1061,17 @@ class NhiemVuCreateView(LoginRequiredMixin, CreateView):
             # Notify Lãnh đạo Văn phòng
             for user in CustomUser.objects.filter(role=CustomUser.Role.LANH_DAO_VAN_PHONG):
                 create_notification(user, message, related_task=form.instance)
+        else: # Task is assigned directly
+            # Send Zalo message to main assignee
+            if form.instance.id_nguoi_xu_ly_chinh and form.instance.id_nguoi_xu_ly_chinh.zalo_user_id:
+                zalo_message = f"Bạn có nhiệm vụ mới: {form.instance.ten_nhiem_vu}. Mô tả: {form.instance.mo_ta[:100]}..."
+                send_zalo_message(form.instance.id_nguoi_xu_ly_chinh.zalo_user_id, zalo_message)
+            
+            # Send Zalo message to co-assignees
+            for co_assignee in form.instance.nguoi_dong_xu_ly.all():
+                if co_assignee.zalo_user_id:
+                    zalo_message = f"Bạn được thêm vào nhiệm vụ: {form.instance.ten_nhiem_vu} với vai trò đồng xử lý. Mô tả: {form.instance.mo_ta[:100]}..."
+                    send_zalo_message(co_assignee.zalo_user_id, zalo_message)
 
         return response
 class NhiemVuUpdateView(LoginRequiredMixin, UpdateView):
@@ -1010,17 +1090,30 @@ class NhiemVuUpdateView(LoginRequiredMixin, UpdateView):
         original_instance = self.get_object()
         new_instance = form.save(commit=False)
 
-        # Determine initial status based on assignment rules
-        assignee = new_instance.id_nguoi_thuc_hien
+        # Ensure ngay_bat_dau is set and timezone-aware
+        if not new_instance.ngay_bat_dau:
+            new_instance.ngay_bat_dau = timezone.now()
+        else:
+            # Make it timezone-aware if it's naive (from form input)
+            if new_instance.ngay_bat_dau.tzinfo is None:
+                new_instance.ngay_bat_dau = timezone.make_aware(new_instance.ngay_bat_dau)
 
-        # Check if assignee is a Super Admin
-        if assignee.role == CustomUser.Role.LANH_DAO_CO_QUAN:
+        # Make ngay_ket_thuc timezone-aware if it's naive
+        if new_instance.ngay_ket_thuc and new_instance.ngay_ket_thuc.tzinfo is None:
+            new_instance.ngay_ket_thuc = timezone.make_aware(new_instance.ngay_ket_thuc)
+
+        # Determine initial status based on assignment rules
+        main_assignee = new_instance.id_nguoi_xu_ly_chinh
+        co_assignees = form.cleaned_data['nguoi_dong_xu_ly']
+
+        # Check if main_assignee is a Super Admin
+        if main_assignee.role == CustomUser.Role.LANH_DAO_CO_QUAN:
             messages.error(self.request, "Không thể giao việc cho vai trò Lãnh đạo Cơ quan.")
             return self.form_invalid(form)
 
         # If the assignee or special status changes, re-evaluate the task status
         if self.request.user.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG and \
-           assignee.role == CustomUser.Role.LANH_DAO_PHONG:
+           main_assignee.role == CustomUser.Role.LANH_DAO_PHONG:
             new_instance.trang_thai = NhiemVu.TrangThai.PENDING_ASSIGNMENT_APPROVAL
             # Reset assignment approver if the flow changes back to pending
             new_instance.id_nguoi_duyet_giao_viec = None
@@ -1030,11 +1123,14 @@ class NhiemVuUpdateView(LoginRequiredMixin, UpdateView):
             # A non-special-flow task has no separate assignment approver
             new_instance.id_nguoi_duyet_giao_viec = None
 
-        # Set id_phong_ban_lien_quan based on assignee's department
-        if assignee.phong_ban:
-            new_instance.id_phong_ban_lien_quan = assignee.phong_ban
+        # Set id_phong_ban_lien_quan based on main_assignee's department
+        if main_assignee.phong_ban:
+            new_instance.id_phong_ban_lien_quan = main_assignee.phong_ban
 
         response = super().form_valid(form)
+
+        # Save many-to-many relationship for co_assignees
+        form.instance.nguoi_dong_xu_ly.set(co_assignees)
 
         # Handle file uploads
         for f in self.request.FILES.getlist('attachments'):
@@ -1045,12 +1141,30 @@ class NhiemVuUpdateView(LoginRequiredMixin, UpdateView):
             )
         messages.success(self.request, "Nhiệm vụ và tệp đính kèm đã được cập nhật thành công!")
 
+        # Send Zalo message to main assignee if changed or task status changed to ASSIGNED
+        if new_instance.trang_thai == NhiemVu.TrangThai.ASSIGNED and \
+           (original_instance.id_nguoi_xu_ly_chinh != new_instance.id_nguoi_xu_ly_chinh or \
+            original_instance.trang_thai != NhiemVu.TrangThai.ASSIGNED):
+            if new_instance.id_nguoi_xu_ly_chinh and new_instance.id_nguoi_xu_ly_chinh.zalo_user_id:
+                zalo_message = f"Nhiệm vụ của bạn đã được cập nhật: {new_instance.ten_nhiem_vu}. Mô tả: {new_instance.mo_ta[:100]}..."
+                send_zalo_message(new_instance.id_nguoi_xu_ly_chinh.zalo_user_id, zalo_message)
+        
+        # Send Zalo message to co-assignees if changed
+        current_co_assignees = set(original_instance.nguoi_dong_xu_ly.all())
+        new_co_assignees = set(new_instance.nguoi_dong_xu_ly.all())
+
+        added_co_assignees = new_co_assignees - current_co_assignees
+        for co_assignee in added_co_assignees:
+            if co_assignee.zalo_user_id:
+                zalo_message = f"Bạn được thêm vào nhiệm vụ: {new_instance.ten_nhiem_vu} với vai trò đồng xử lý. Mô tả: {new_instance.mo_ta[:100]}..."
+                send_zalo_message(co_assignee.zalo_user_id, zalo_message)
+
         return response
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object() # Get the task object
-        # Check if the current user is the assignee
-        if self.object.id_nguoi_thuc_hien == request.user:
+        # Check if the current user is the main assignee or a co-assignee
+        if self.object.id_nguoi_xu_ly_chinh == request.user or request.user in self.object.nguoi_dong_xu_ly.all():
             messages.error(request, "Bạn không có quyền sửa đổi nhiệm vụ này.")
             return redirect('nhiemvu-detail', pk=self.object.pk) # Redirect to detail view
         return super().dispatch(request, *args, **kwargs)

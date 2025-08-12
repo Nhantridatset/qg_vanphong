@@ -1,0 +1,87 @@
+/* Custom styling for Select2 to match Tailwind/Django form styles */
+
+/* Base styling for Select2 container */
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+    /* Match form-input base styles */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--color-gray-300, #D1D5DB); /* Default gray-300 */
+    border-radius: 8px; /* rounded-lg */
+    width: 100%;
+    min-height: 44px; /* py-3 (12px top/bottom) + border (1px*2) + content height */
+    padding: 12px 16px; /* py-3 px-4 */
+    color: var(--color-text, #1F2937);
+    line-height: 1.5;
+    transition: all 0.2s ease;
+    display: flex; /* Use flex to align content vertically */
+    align-items: center;
+}
+
+/* Focus state */
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+    outline: none;
+    border-color: var(--color-primary, #6366F1);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5); /* ring-2 ring-primary */
+}
+
+/* Rendered text within single select */
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: var(--color-text, #1F2937);
+    padding: 0; /* Remove default padding */
+    line-height: normal; /* Reset line-height */
+}
+
+/* Placeholder text */
+.select2-container--default .select2-selection--single .select2-selection__placeholder {
+    color: #6B7280; /* gray-500 */
+}
+
+/* Arrow icon */
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 100%; /* Make arrow span full height */
+    top: 0;
+    right: 8px; /* Adjust position */
+    width: 20px; /* Adjust width */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Clear button for single select */
+.select2-container--default .select2-selection--single .select2-selection__clear {
+    margin-right: 8px;
+}
+
+/* Multiple select choices (tags) */
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: var(--color-primary, #6366F1);
+    color: white;
+    border: 1px solid var(--color-primary, #6366F1);
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin-top: 4px;
+    margin-right: 4px;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: white;
+    margin-right: 4px;
+}
+
+/* Input field within multiple select */
+.select2-container--default .select2-selection--multiple .select2-search__field {
+    color: var(--color-text, #1F2937);
+    margin-top: 4px;
+}
+
+/* Dropdown results */
+.select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+    background-color: var(--color-primary, #6366F1) !important;
+    color: white !important;
+}
+
+.select2-container--default .select2-results__option--selected {
+    background-color: var(--color-background, #F3F4F6);
+    color: var(--color-text, #1F2937);
+}

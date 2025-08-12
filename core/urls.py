@@ -102,4 +102,5 @@ urlpatterns = [
     path('nhiemvu/<int:pk>/complete-and-rate/', views.complete_and_rate_nhiemvu_view, name='complete-and-rate-nhiemvu'),
     path('nhiemvu/<int:pk>/approve-completion-and-rate/', views.approve_completion_and_rate_nhiemvu_view, name='approve-completion-and-rate-nhiemvu'),
     path('ajax/get-user-role/<int:user_id>/', views.get_user_role, name='get-user-role'),
+    path('ajax/get-users-for-autocomplete/', views.get_users_for_autocomplete, name='get-users-for-autocomplete'),
 ]

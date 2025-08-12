@@ -30,7 +30,7 @@
         <div class="md:col-span-3 bg-white p-6 rounded-xl shadow-md mb-6 border-l-4 border-red-500">
             <h2 class="text-xl font-semibold mb-3 text-red-700">Công việc hết hạn vào ngày mai</h2>
             <div class="space-y-3 overflow-y-auto" style="max-height: 200px;"> {# Added max-height and overflow-y #}
-                {% for task in tasks_due_in_one_day|slice:":3" %} {# Limited to 3 tasks #}
+                {% for task in tasks_due_in_one_day %}
                     <a href="{% url 'nhiemvu-detail' task.pk %}" class="block p-3 rounded-lg bg-red-50 hover:bg-red-100 transition-colors">
                         <p class="font-medium text-slate-800">{{ task.ten_nhiem_vu }}</p>
                         <p class="text-sm text-slate-500">Hết hạn: {{ task.ngay_ket_thuc|date:"d/m/Y" }}</p>
@@ -45,7 +45,7 @@
         <div class="md:col-span-3 bg-white p-6 rounded-xl shadow-md mb-6 border-l-4 border-amber-500">
             <h2 class="text-xl font-semibold mb-3 text-amber-700">Công việc sắp đến hạn</h2>
             <div class="space-y-3 overflow-y-auto" style="max-height: 200px;"> {# Added max-height and overflow-y #}
-                {% for task in upcoming_tasks|slice:":3" %} {# Limited to 3 tasks #}
+                {% for task in upcoming_tasks %}
                     <a href="{% url 'nhiemvu-detail' task.pk %}" class="block p-3 rounded-lg bg-amber-50 hover:bg-amber-100 transition-colors">
                         <p class="font-medium text-slate-800">{{ task.ten_nhiem_vu }}</p>
                         <p class="text-sm text-slate-500">Hết hạn: {{ task.ngay_ket_thuc|date:"d/m/Y" }}</p>
@@ -67,15 +67,37 @@
                 {% for task in pending_assignment_tasks %}
                     <div class="flex items-center justify-between p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
                         <div>
-                            <p class="font-medium text-slate-800">{{ task.ten_nhiem_vu }}</p>
+                            <p class="font-medium text-slate-800">Nhiệm vụ: {{ task.ten_nhiem_vu }}</p>
                             <p class="text-sm text-slate-500">Người giao: {{ task.id_nguoi_giao_viec.username }}</p>
                             <p class="text-sm text-slate-500">Người thực hiện: {{ task.id_nguoi_thuc_hien.username }}</p>
                         </div>
                         <a href="{% url 'approve-assignment' task.pk %}" class="px-3 py-1 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors">Duyệt</a>
                     </div>
-                {% empty %}
+                {% empty %}{% endfor %}
+                
+                {% for hosocongviec in pending_assignment_hosocongviec %}
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
+                        <div>
+                            <p class="font-medium text-slate-800">Hồ sơ công việc: {{ hosocongviec.ten_ho_so_cong_viec }}</p>
+                            <p class="text-sm text-slate-500">Người quản lý: {{ hosocongviec.id_nguoi_quan_ly.username }}</p>
+                        </div>
+                        <a href="{% url 'approve-hosocongviec' hosocongviec.pk %}" class="px-3 py-1 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors">Duyệt</a>
+                    </div>
+                {% empty %}{% endfor %}
+
+                {% for kehoach in pending_assignment_kehoach %}
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
+                        <div>
+                            <p class="font-medium text-slate-800">Kế hoạch: {{ kehoach.ten_ke_hoach }}</p>
+                            <p class="text-sm text-slate-500">Người phụ trách: {{ kehoach.id_nguoi_phu_trach.username }}</p>
+                        </div>
+                        <a href="{% url 'approve-kehoach' kehoach.pk %}" class="px-3 py-1 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors">Duyệt</a>
+                    </div>
+                {% empty %}{% endfor %}
+
+                {% if not pending_assignment_tasks and not pending_assignment_hosocongviec and not pending_assignment_kehoach %}
                     <p class="text-slate-500">Không có công việc nào chờ duyệt giao.</p>
-                {% endfor %}
+                {% endif %}
             </div>
 
             {# Duyệt Hoàn thành #}

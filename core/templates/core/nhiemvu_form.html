@@ -2,6 +2,10 @@
 
 {% block title %}{% if form.instance.pk %}Sửa Nhiệm vụ{% else %}Tạo Nhiệm vụ mới{% endif %}{% endblock %}
 
+{% block extra_head %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{% endblock %}
+
 {% block content %}
     <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-md">
         <h1 class="text-2xl font-bold text-slate-800 mb-6">{% if form.instance.pk %}Sửa Nhiệm vụ{% else %}Tạo Nhiệm vụ mới{% endif %}</h1>
@@ -39,68 +43,87 @@
             </div>
         </form>
     </div>
+{% endblock content %}
 
+{% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('form');
-        const formGroups = form.querySelectorAll('.form-group');
-        const colors = ['blue', 'red', 'yellow']; // Google-style colors
-        let colorIndex = 0;
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Select2 for single select
+            $('.select2-single').select2();
 
-        formGroups.forEach(group => {
-            const input = group.querySelector('input:not([type="file"]), textarea, select');
-            if (input) {
-                const currentColor = colors[colorIndex % colors.length];
-                input.classList.add(
-                    'mt-1', 'block', 'w-full', 'px-3', 'py-2', 'border',
-                    `border-${currentColor}-300`, 'rounded-md', 'shadow-sm', 'focus:outline-none',
-                    `focus:ring-${currentColor}-500`, `focus:border-${currentColor}-500`, 'sm:text-sm'
-                );
-                colorIndex++;
-            }
-        });
+            // Initialize Select2 for multiple select
+            $('.select2-multiple').select2();
 
-        // Show/hide recurring fields based on checkbox
-        const isRecurringCheckbox = document.getElementById('id_is_recurring');
-        const recurringFrequencyField = document.getElementById('id_recurring_frequency').closest('.form-group');
-        const recurringUntilField = document.getElementById('id_recurring_until').closest('.form-group');
+            const form = document.querySelector('form');
+            const formGroups = form.querySelectorAll('.form-group');
+            const colors = ['blue', 'red', 'yellow']; // Google-style colors
+            let colorIndex = 0;
 
-        function toggleRecurringFields() {
-            if (isRecurringCheckbox.checked) {
-                recurringFrequencyField.style.display = 'block';
-                recurringUntilField.style.display = 'block';
-            } else {
-                recurringFrequencyField.style.display = 'none';
-                recurringUntilField.style.display = 'none';
-            }
-        }
+            formGroups.forEach(group => {
+                const input = group.querySelector('input:not([type="file"]), textarea, select');
+                // Target the visible part of Select2 input
+                const select2Selection = group.querySelector('.select2-container--default .select2-selection'); 
 
-        if (isRecurringCheckbox && recurringFrequencyField && recurringUntilField) {
-            isRecurringCheckbox.addEventListener('change', toggleRecurringFields);
-            toggleRecurringFields(); // Initial call on page load
-        }
+                let targetElement = null;
+                if (input) {
+                    targetElement = input;
+                } else if (select2Selection) { // Use select2Selection
+                    targetElement = select2Selection;
+                }
 
-        // Logic for special workflow checkbox
-        const assigneeSelect = document.getElementById('id_id_nguoi_thuc_hien');
-        const specialWorkflowCheckbox = document.getElementById('id_is_quy_trinh_dac_biet');
-        const currentUserRole = "{{ request.user.role }}";
-
-        if (assigneeSelect && specialWorkflowCheckbox) {
-            assigneeSelect.addEventListener('change', function() {
-                const selectedUserId = this.value;
-                if (selectedUserId) {
-                    fetch(`/ajax/get-user-role/${selectedUserId}/`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (currentUserRole === 'CHUYEN_VIEN_VAN_PHONG' && data.role === 'LANH_DAO_PHONG') {
-                                specialWorkflowCheckbox.checked = true;
-                            } else {
-                                specialWorkflowCheckbox.checked = false;
-                            }
-                        });
+                if (targetElement) {
+                    const currentColor = colors[colorIndex % colors.length];
+                    targetElement.classList.add(
+                        'mt-1', 'block', 'w-full', 'px-3', 'py-2', 'border',
+                        `border-${currentColor}-300`, 'rounded-md', 'shadow-sm', 'focus:outline-none',
+                        `focus:ring-${currentColor}-500`, `focus:border-${currentColor}-500`, 'sm:text-sm'
+                    );
+                    colorIndex++;
                 }
             });
-        }
-    });
+
+            // Show/hide recurring fields based on checkbox
+            const isRecurringCheckbox = document.getElementById('id_is_recurring');
+            const recurringFrequencyField = document.getElementById('id_recurring_frequency').closest('.form-group');
+            const recurringUntilField = document.getElementById('id_recurring_until').closest('.form-group');
+
+            function toggleRecurringFields() {
+                if (isRecurringCheckbox.checked) {
+                    recurringFrequencyField.style.display = 'block';
+                    recurringUntilField.style.display = 'block';
+                } else {
+                    recurringFrequencyField.style.display = 'none';
+                    recurringUntilField.style.display = 'none';
+                }
+            }
+
+            if (isRecurringCheckbox && recurringFrequencyField && recurringUntilField) {
+                isRecurringCheckbox.addEventListener('change', toggleRecurringFields);
+                toggleRecurringFields(); // Initial call on page load
+            }
+
+            // Logic for special workflow checkbox
+            const mainAssigneeSelect = document.getElementById('id_id_nguoi_xu_ly_chinh');
+            const specialWorkflowCheckbox = document.getElementById('id_is_quy_trinh_dac_biet');
+            const currentUserRole = "{{ request.user.role }}";
+
+            if (mainAssigneeSelect && specialWorkflowCheckbox) {
+                mainAssigneeSelect.addEventListener('change', function() {
+                    const selectedUserId = this.value;
+                    if (selectedUserId) {
+                        fetch(`/ajax/get-user-role/${selectedUserId}/`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (currentUserRole === 'CHUYEN_VIEN_VAN_PHONG' && data.role === 'LANH_DAO_PHONG') {
+                                    specialWorkflowCheckbox.checked = true;
+                                } else {
+                                    specialWorkflowCheckbox.checked = false;
+                                }
+                            });
+                    }
+                });
+            }
+        });
     </script>
 {% endblock %}
