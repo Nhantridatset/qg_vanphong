@@ -23,6 +23,15 @@
                             <p class="mt-1 text-sm text-red-600">{{ error }}</p>
                         {% endfor %}
                     </div>
+                    {% if field.name == 'id_nhiem_vu_cha' %}
+                        <div class="form-group">
+                            <label for="id_id_nguoi_duyet" class="block text-sm font-medium text-gray-700">Người duyệt</label>
+                            {{ form.id_nguoi_duyet }}
+                            {% for error in form.id_nguoi_duyet.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                     {% if field.name == 'ten_nhiem_vu' %}
                         <div class="form-group">
                             <label for="attachments" class="block text-sm font-medium text-gray-700">Tệp đính kèm</label>

@@ -15,9 +15,17 @@ class HoSoCongViecForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        self.request_user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         if not self.instance.pk: # Only set default for new instances
             self.initial['ngay_bat_dau'] = timezone.now()
+
+        if self.request_user and self.request_user.phong_ban:
+            # Filter id_nguoi_quan_ly to show only LANH_DAO_PHONG from the same department
+            self.fields['id_nguoi_quan_ly'].queryset = CustomUser.objects.filter(
+                phong_ban=self.request_user.phong_ban,
+                role=CustomUser.Role.LANH_DAO_PHONG
+            )
 
 class KeHoachForm(forms.ModelForm):
     class Meta:
@@ -26,12 +34,56 @@ class KeHoachForm(forms.ModelForm):
         widgets = {
             'thoi_gian_bat_dau': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'thoi_gian_ket_thuc': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'id_don_vi_thuc_hien': forms.Select(attrs={'class': 'select2-single'}),
+            'don_vi_phoi_hop': forms.SelectMultiple(attrs={'class': 'select2-multiple'}),
+            'id_nguoi_phu_trach': forms.Select(attrs={'class': 'select2-single'}),
         }
 
     def __init__(self, *args, **kwargs):
+        self.request_user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-        if not self.instance.pk: # Only set default for new instances
+        if not self.instance.pk:
             self.initial['thoi_gian_bat_dau'] = timezone.now()
+
+        co_quan = None
+        
+        # If form is bound to data (POST request), get CoQuan from submitted HoSoCongViec
+        if self.is_bound:
+            try:
+                hscv_id = int(self.data.get('id_du_an'))
+                ho_so_cong_viec = HoSoCongViec.objects.get(pk=hscv_id)
+                if ho_so_cong_viec.id_don_vi_chu_tri:
+                    co_quan = ho_so_cong_viec.id_don_vi_chu_tri.co_quan
+            except (TypeError, ValueError, HoSoCongViec.DoesNotExist):
+                pass # Keep co_quan as None
+        # If form is not bound (GET request) and is for an existing instance
+        elif self.instance and self.instance.pk and self.instance.id_du_an:
+            if self.instance.id_du_an.id_don_vi_chu_tri:
+                co_quan = self.instance.id_du_an.id_don_vi_chu_tri.co_quan
+        # If form is not bound (GET request) and is for a new instance
+        else:
+            if self.request_user and self.request_user.co_quan:
+                co_quan = self.request_user.co_quan
+
+        # Filter the querysets if a CoQuan has been determined
+        if co_quan:
+            phong_ban_queryset = PhongBan.objects.filter(co_quan=co_quan)
+            leader_queryset = CustomUser.objects.filter(
+                co_quan=co_quan,
+                role__in=[
+                    CustomUser.Role.LANH_DAO_CO_QUAN,
+                    CustomUser.Role.LANH_DAO_VAN_PHONG,
+                    CustomUser.Role.LANH_DAO_PHONG
+                ]
+            )
+            self.fields['id_don_vi_thuc_hien'].queryset = phong_ban_queryset
+            self.fields['don_vi_phoi_hop'].queryset = phong_ban_queryset
+            self.fields['id_nguoi_phu_trach'].queryset = leader_queryset
+        else:
+            # If no CoQuan can be determined, show no options.
+            self.fields['id_don_vi_thuc_hien'].queryset = PhongBan.objects.none()
+            self.fields['don_vi_phoi_hop'].queryset = PhongBan.objects.none()
+            self.fields['id_nguoi_phu_trach'].queryset = CustomUser.objects.none()
 
 class MocThoiGianForm(forms.ModelForm):
     class Meta:
@@ -50,7 +102,7 @@ class NhiemVuForm(forms.ModelForm):
             'id_ke_hoach', 'id_nguoi_xu_ly_chinh', 'nguoi_dong_xu_ly', 'id_nhiem_vu_cha',
             'thoi_gian_uoc_tinh',
             'is_recurring', 'recurring_frequency', 'recurring_until',
-            # 'is_quy_trinh_dac_biet', # Removed from form as it's an internal flag
+            'id_nguoi_duyet', # New field for explicit approver
         ]
         widgets = {
             'ngay_bat_dau': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
@@ -59,6 +111,7 @@ class NhiemVuForm(forms.ModelForm):
             'recurring_until': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'id_nguoi_xu_ly_chinh': forms.Select(attrs={'class': 'select2-single'}),
             'nguoi_dong_xu_ly': forms.SelectMultiple(attrs={'class': 'select2-multiple'}),
+            'id_nguoi_duyet': forms.Select(attrs={'class': 'select2-single'}), # Widget for new field
         }
 
     def __init__(self, *args, **kwargs):
@@ -102,6 +155,11 @@ class NhiemVuForm(forms.ModelForm):
             self.fields['nguoi_dong_xu_ly'].queryset = CustomUser.objects.exclude(role=CustomUser.Role.LANH_DAO_CO_QUAN)
             if self.instance and self.instance.id_nguoi_xu_ly_chinh:
                 self.fields['nguoi_dong_xu_ly'].queryset = self.fields['nguoi_dong_xu_ly'].queryset.exclude(pk=self.instance.id_nguoi_xu_ly_chinh.pk)
+
+            # Filter id_nguoi_duyet (approver) - only LANH_DAO_CO_QUAN and LANH_DAO_VAN_PHONG
+            self.fields['id_nguoi_duyet'].queryset = CustomUser.objects.filter(
+                Q(role=CustomUser.Role.LANH_DAO_CO_QUAN) | Q(role=CustomUser.Role.LANH_DAO_VAN_PHONG)
+            )
 
             # Filter id_ke_hoach (plan) based on user's role and associated projects/departments
             if self.request_user.role == CustomUser.Role.LANH_DAO_CO_QUAN:

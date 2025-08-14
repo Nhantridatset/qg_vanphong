@@ -252,6 +252,45 @@ def get_users_for_autocomplete(request):
         results.append({'id': user.pk, 'text': user.get_full_name() or user.username})
     return JsonResponse({'results': results})
 
+
+@login_required
+def ajax_load_kehoach_dependencies(request):
+    ho_so_cong_viec_id = request.GET.get('ho_so_cong_viec_id')
+    data = {
+        'phongban_list': [],
+        'don_vi_chu_tri_id': None,
+        'leader_list': []
+    }
+    if ho_so_cong_viec_id:
+        try:
+            ho_so_cong_viec = HoSoCongViec.objects.get(pk=ho_so_cong_viec_id)
+            if ho_so_cong_viec.id_don_vi_chu_tri and ho_so_cong_viec.id_don_vi_chu_tri.co_quan:
+                co_quan = ho_so_cong_viec.id_don_vi_chu_tri.co_quan
+                
+                # Get PhongBans
+                phongbans = PhongBan.objects.filter(co_quan=co_quan).order_by('name')
+                for phongban in phongbans:
+                    data['phongban_list'].append({'id': phongban.pk, 'name': phongban.name})
+                
+                # Get Leaders
+                leaders = CustomUser.objects.filter(
+                    co_quan=co_quan,
+                    role__in=[
+                        CustomUser.Role.LANH_DAO_CO_QUAN,
+                        CustomUser.Role.LANH_DAO_VAN_PHONG,
+                        CustomUser.Role.LANH_DAO_PHONG
+                    ]
+                ).order_by('username')
+                for leader in leaders:
+                    data['leader_list'].append({'id': leader.pk, 'name': leader.get_full_name() or leader.username})
+
+                # Get leading unit ID
+                data['don_vi_chu_tri_id'] = ho_so_cong_viec.id_don_vi_chu_tri.pk
+
+        except HoSoCongViec.DoesNotExist:
+            pass
+    return JsonResponse(data)
+
 @require_POST
 @login_required
 def update_task_date_from_calendar(request):
@@ -388,15 +427,13 @@ def approve_assignment_view(request, pk):
         return redirect('nhiemvu-detail', pk=pk)
 
     # Check if the current user has permission to approve
-    # Lãnh đạo Cơ quan HOẶC Lãnh đạo Văn phòng
-    if not (request.user.role == CustomUser.Role.LANH_DAO_CO_QUAN or \
-            request.user.role == CustomUser.Role.LANH_DAO_VAN_PHONG):
+    if request.user != nhiemvu.id_nguoi_duyet:
         messages.error(request, "Bạn không có quyền phê duyệt nhiệm vụ này.")
         return redirect('nhiemvu-detail', pk=pk)
 
     if request.method == 'POST':
         nhiemvu.trang_thai = NhiemVu.TrangThai.ASSIGNED
-        nhiemvu.id_nguoi_duyet_giao_viec = request.user  # Save the approver
+        # nhiemvu.id_nguoi_duyet_giao_viec = request.user  # Removed: now uses pre-selected id_nguoi_duyet
         nhiemvu.save()
         messages.success(request, f"Đã phê duyệt giao nhiệm vụ '{nhiemvu.ten_nhiem_vu}' thành công!")
         
@@ -474,7 +511,7 @@ def approve_completion_and_rate_nhiemvu_view(request, pk):
         )
         # Send notification to assignee
         message_to_assignee = f"Nhiệm vụ '{nhiemvu.ten_nhiem_vu}' của bạn đã được phê duyệt hoàn thành và chấm điểm."
-        create_notification(nhiemvu.id_nguoi_xu_ly_chinh, message_to_assignee, related_task=nhiemvu)
+        create_notification(nhiemvu.completion_approver, message_to_assignee, related_task=nhiemvu)
 
         return redirect('nhiemvu-detail', pk=pk)
 
@@ -1017,6 +1054,8 @@ class NhiemVuCreateView(LoginRequiredMixin, CreateView):
         if self.request.user.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG and \
            main_assignee.role == CustomUser.Role.LANH_DAO_PHONG:
             form.instance.trang_thai = NhiemVu.TrangThai.PENDING_ASSIGNMENT_APPROVAL
+            # Set the explicit approver if special workflow is triggered
+            form.instance.id_nguoi_duyet = form.cleaned_data.get('id_nguoi_duyet')
         else:
             form.instance.trang_thai = NhiemVu.TrangThai.ASSIGNED
 
@@ -1115,6 +1154,8 @@ class NhiemVuUpdateView(LoginRequiredMixin, UpdateView):
         if self.request.user.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG and \
            main_assignee.role == CustomUser.Role.LANH_DAO_PHONG:
             new_instance.trang_thai = NhiemVu.TrangThai.PENDING_ASSIGNMENT_APPROVAL
+            # Set the explicit approver if special workflow is triggered
+            new_instance.id_nguoi_duyet = form.cleaned_data.get('id_nguoi_duyet')
             # Reset assignment approver if the flow changes back to pending
             new_instance.id_nguoi_duyet_giao_viec = None
         else:
@@ -1122,6 +1163,7 @@ class NhiemVuUpdateView(LoginRequiredMixin, UpdateView):
             new_instance.trang_thai = NhiemVu.TrangThai.ASSIGNED
             # A non-special-flow task has no separate assignment approver
             new_instance.id_nguoi_duyet_giao_viec = None
+            new_instance.id_nguoi_duyet = None # Clear explicit approver if not special workflow
 
         # Set id_phong_ban_lien_quan based on main_assignee's department
         if main_assignee.phong_ban:

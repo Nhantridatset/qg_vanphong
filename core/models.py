@@ -34,7 +34,7 @@ class HoSoCongViec(models.Model):
     can_cu_phap_ly = models.TextField(verbose_name=_('Căn cứ pháp lý'))
     ngay_bat_dau = models.DateTimeField(verbose_name=_('Ngày bắt đầu'), null=True, blank=True)
     ngay_ket_thuc = models.DateTimeField(verbose_name=_('Ngày kết thúc'), null=True, blank=True)
-    id_nguoi_quan_ly = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='du_an_quan_ly', verbose_name=_('Người quản lý'))
+    id_nguoi_quan_ly = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='du_an_quan_ly', verbose_name=_('LĐ theo dõi'))
     id_don_vi_chu_tri = models.ForeignKey(PhongBan, on_delete=models.SET_NULL, null=True, verbose_name=_('Đơn vị chủ trì'))
 
     def __str__(self):
@@ -55,7 +55,8 @@ class KeHoach(models.Model):
     thoi_gian_ket_thuc = models.DateTimeField(verbose_name=_('Thời gian kết thúc'))
     id_du_an = models.ForeignKey(HoSoCongViec, on_delete=models.CASCADE, related_name='ke_hoach', verbose_name=_('Hồ sơ công việc'))
     id_don_vi_thuc_hien = models.ForeignKey(PhongBan, on_delete=models.SET_NULL, null=True, verbose_name=_('Đơn vị thực hiện'))
-    id_nguoi_phu_trach = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='ke_hoach_phu_trach', verbose_name=_('Người phụ trách'))
+    don_vi_phoi_hop = models.ManyToManyField(PhongBan, related_name='ke_hoach_phoi_hop', blank=True, verbose_name=_('Đơn vị phối hợp'))
+    id_nguoi_phu_trach = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='ke_hoach_phu_trach', verbose_name=_('LĐ theo dõi'))
 
     def __str__(self):
         return self.ten_ke_hoach
@@ -136,6 +137,9 @@ class NhiemVu(models.Model):
     is_quy_trinh_dac_biet = models.BooleanField(default=False, verbose_name=_('Quy trình đặc biệt'))
     id_nguoi_duyet_giao_viec = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='nhiem_vu_da_duyet_giao', verbose_name=_('Người duyệt giao việc'))
 
+    # New field for explicit approver in special workflow
+    id_nguoi_duyet = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='nhiem_vu_duyet', verbose_name=_('Người duyệt'))
+
     # Fields for time tracking
     ngay_hoan_thanh = models.DateTimeField(null=True, blank=True, verbose_name=_('Ngày hoàn thành'))
 
@@ -153,7 +157,7 @@ class NhiemVu(models.Model):
     @property
     def completion_approver(self):
         if self.is_quy_trinh_dac_biet:
-            return self.id_nguoi_duyet_giao_viec
+            return self.id_nguoi_duyet # Use the explicitly selected approver
         return self.id_nguoi_giao_viec
 
 class BinhLuan(models.Model):

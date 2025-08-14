@@ -2,6 +2,10 @@
 
 {% block title %}{% if form.instance.pk %}Sửa Kế hoạch{% else %}Tạo Kế hoạch mới{% endif %}{% endblock %}
 
+{% block extra_head %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{% endblock %}
+
 {% block content %}
     <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-md">
         <h1 class="text-2xl font-bold text-slate-800 mb-6">{% if form.instance.pk %}Sửa Kế hoạch{% else %}Tạo Kế hoạch mới{% endif %}</h1>
@@ -39,16 +43,29 @@
             </div>
         </form>
     </div>
+{% endblock content %}
 
+{% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Select2
+        $('.select2-single').select2({
+            width: '100%'
+        });
+        $('.select2-multiple').select2({
+            width: '100%'
+        });
+
+        // Original color script
         const form = document.querySelector('form');
         const formGroups = form.querySelectorAll('.form-group');
         const colors = ['blue', 'red', 'yellow']; // Google-style colors
         let colorIndex = 0;
 
         formGroups.forEach(group => {
-            const input = group.querySelector('input:not([type="file"]), textarea, select');
+            // Apply colors to standard inputs, but not the original selects hidden by Select2
+            const input = group.querySelector('input:not([type="file"]), textarea, select:not(.select2-hidden-accessible)');
             if (input) {
                 const currentColor = colors[colorIndex % colors.length];
                 input.classList.add(
@@ -58,6 +75,62 @@
                 );
                 colorIndex++;
             }
+        });
+
+        // AJAX for dependent dropdowns
+        $("#id_id_du_an").change(function () {
+            const url = "{% url 'ajax-load-kehoach-dependencies' %}";
+            const hoSoCongViecId = $(this).val();
+
+            $.ajax({
+                url: url,
+                data: {
+                    'ho_so_cong_viec_id': hoSoCongViecId
+                },
+                success: function (data) {
+                    let phongBanThucHienSelect = $("#id_id_don_vi_thuc_hien");
+                    let phongBanPhoiHopSelect = $("#id_don_vi_phoi_hop");
+                    let nguoiPhuTrachSelect = $("#id_id_nguoi_phu_trach");
+
+                    // Save current values
+                    let currentPhoiHop = phongBanPhoiHopSelect.val();
+                    let currentNguoiPhuTrach = nguoiPhuTrachSelect.val();
+
+                    // Clear dropdowns
+                    phongBanThucHienSelect.empty();
+                    phongBanPhoiHopSelect.empty();
+                    nguoiPhuTrachSelect.empty();
+
+                    // Add placeholders for single-selects
+                    phongBanThucHienSelect.append($('<option>', { value: '', text: '---------' }));
+                    nguoiPhuTrachSelect.append($('<option>', { value: '', text: '---------' }));
+
+                    // Populate PhongBan dropdowns
+                    $.each(data.phongban_list, function (key, value) {
+                        phongBanThucHienSelect.append($('<option>', { value: value.id, text: value.name }));
+                        phongBanPhoiHopSelect.append($('<option>', { value: value.id, text: value.name }));
+                    });
+
+                    // Populate Leader dropdown
+                    $.each(data.leader_list, function (key, value) {
+                        nguoiPhuTrachSelect.append($('<option>', { value: value.id, text: value.name }));
+                    });
+
+                    // Set the default executing unit
+                    if (data.don_vi_chu_tri_id) {
+                        phongBanThucHienSelect.val(data.don_vi_chu_tri_id);
+                    }
+
+                    // Restore previous selections if possible
+                    phongBanPhoiHopSelect.val(currentPhoiHop);
+                    nguoiPhuTrachSelect.val(currentNguoiPhuTrach);
+
+                    // Refresh all select2 widgets
+                    phongBanThucHienSelect.trigger('change');
+                    phongBanPhoiHopSelect.trigger('change');
+                    nguoiPhuTrachSelect.trigger('change');
+                }
+            });
         });
     });
     </script>
