@@ -30,3 +30,15 @@ VENV/
 .idea/
 .vscode/
 *.swp
+
+# Ashampoo Snap screenshots
+*.png
+
+# Database backups
+*.json
+
+# Attachments (if not intended to be version controlled)
+attachments/
+
+# Specific untracked files that should be ignored
+core/templates/core/search.html
