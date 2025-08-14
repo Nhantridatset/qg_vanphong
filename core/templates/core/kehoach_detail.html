@@ -24,8 +24,11 @@
         </div>
 
         <div class="mt-8 flex items-center justify-start space-x-4">
-            {% if request.user.is_authenticated and request.user.role == 'LANH_DAO_CO_QUAN' and object.trang_thai == 'CHUA_BAT_DAU' %}
-                <a href="{% url 'approve-kehoach' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition-colors">Duyệt Kế hoạch</a>
+            {% if can_approve_kehoach %}
+                <form method="post" action="{% url 'approve-kehoach' object.pk %}" class="inline-block">
+                    {% csrf_token %}
+                    <button type="submit" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition-colors">Duyệt Kế hoạch</button>
+                </form>
             {% endif %}
             <a href="{% url 'kehoach-update' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">Sửa</a>
             <a href="{% url 'kehoach-delete' object.pk %}" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors">Xóa</a>

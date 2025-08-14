@@ -330,7 +330,7 @@ def task_handover_view(request):
 def approve_hosocongviec_view(request, pk):
     hosocongviec = get_object_or_404(HoSoCongViec, pk=pk)
     if request.method == 'POST':
-        if request.user.role == CustomUser.Role.LANH_DAO_CO_QUAN:
+        if request.user == hosocongviec.id_nguoi_quan_ly:
             hosocongviec.trang_thai = HoSoCongViec.TrangThai.DA_DUYET
             hosocongviec.save()
             messages.success(request, _(f'Hồ sơ công việc "{hosocongviec.ten_ho_so_cong_viec}" đã được phê duyệt.'))
@@ -342,7 +342,7 @@ def approve_hosocongviec_view(request, pk):
 def approve_kehoach_view(request, pk):
     kehoach = get_object_or_404(KeHoach, pk=pk)
     if request.method == 'POST':
-        if request.user.role == CustomUser.Role.LANH_DAO_PHONG:
+        if request.user == kehoach.id_nguoi_phu_trach:
             kehoach.trang_thai = KeHoach.TrangThai.DA_DUYET
             kehoach.save()
             messages.success(request, _(f'Kế hoạch "{kehoach.ten_ke_hoach}" đã được phê duyệt.'))
@@ -433,7 +433,7 @@ def approve_assignment_view(request, pk):
 
     if request.method == 'POST':
         nhiemvu.trang_thai = NhiemVu.TrangThai.ASSIGNED
-        # nhiemvu.id_nguoi_duyet_giao_viec = request.user  # Removed: now uses pre-selected id_nguoi_duyet
+        nhiemvu.id_nguoi_duyet = request.user # Add this line
         nhiemvu.save()
         messages.success(request, f"Đã phê duyệt giao nhiệm vụ '{nhiemvu.ten_nhiem_vu}' thành công!")
         
@@ -726,6 +726,19 @@ class HoSoCongViecDetailView(LoginRequiredMixin, DetailView):
         else:
             raise Http404("Hồ sơ công việc không tồn tại hoặc bạn không có quyền truy cập.")
         return obj
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        hosocongviec = self.object
+        user = self.request.user
+
+        can_approve_hosocongviec = False
+        if hosocongviec.trang_thai == HoSoCongViec.TrangThai.CHO_PHE_DUYET:
+            if user == hosocongviec.id_nguoi_quan_ly:
+                can_approve_hosocongviec = True
+
+        context['can_approve_hosocongviec'] = can_approve_hosocongviec
+        return context
 class HoSoCongViecCreateView(LoginRequiredMixin, CreateView):
     model = HoSoCongViec
     form_class = HoSoCongViecForm
@@ -820,6 +833,19 @@ class KeHoachDetailView(LoginRequiredMixin, DetailView):
         else:
             raise Http404("Kế hoạch không tồn tại hoặc bạn không có quyền truy cập.")
         return obj
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        kehoach = self.object
+        user = self.request.user
+
+        can_approve_kehoach = False
+        if kehoach.trang_thai == KeHoach.TrangThai.CHUA_BAT_DAU:
+            if user == kehoach.id_nguoi_phu_trach:
+                can_approve_kehoach = True
+
+        context['can_approve_kehoach'] = can_approve_kehoach
+        return context
 class KeHoachCreateView(LoginRequiredMixin, CreateView):
     model = KeHoach
     form_class = KeHoachForm
@@ -995,6 +1021,16 @@ class NhiemVuDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        nhiemvu = self.object
+        user = self.request.user
+
+        # Determine if the current user can approve assignment
+        can_approve_assignment = False
+        if nhiemvu.trang_thai == NhiemVu.TrangThai.PENDING_ASSIGNMENT_APPROVAL:
+            if user == nhiemvu.id_nguoi_duyet:
+                can_approve_assignment = True
+
+        context['can_approve_assignment'] = can_approve_assignment
         context['binh_luan'] = self.object.binh_luan.all() # Get all comments for the task
         context['form'] = BinhLuanForm() # Pass an empty form for comments
         return context
@@ -1051,11 +1087,12 @@ class NhiemVuCreateView(LoginRequiredMixin, CreateView):
             messages.error(self.request, "Không thể giao việc cho vai trò Lãnh đạo Cơ quan.")
             return self.form_invalid(form)
 
+        # Always set id_nguoi_duyet if it's provided in the form
+        form.instance.id_nguoi_duyet = form.cleaned_data.get('id_nguoi_duyet')
+
         if self.request.user.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG and \
            main_assignee.role == CustomUser.Role.LANH_DAO_PHONG:
             form.instance.trang_thai = NhiemVu.TrangThai.PENDING_ASSIGNMENT_APPROVAL
-            # Set the explicit approver if special workflow is triggered
-            form.instance.id_nguoi_duyet = form.cleaned_data.get('id_nguoi_duyet')
         else:
             form.instance.trang_thai = NhiemVu.TrangThai.ASSIGNED
 
@@ -1150,12 +1187,13 @@ class NhiemVuUpdateView(LoginRequiredMixin, UpdateView):
             messages.error(self.request, "Không thể giao việc cho vai trò Lãnh đạo Cơ quan.")
             return self.form_invalid(form)
 
+        # Always set id_nguoi_duyet if it's provided in the form
+        new_instance.id_nguoi_duyet = form.cleaned_data.get('id_nguoi_duyet')
+
         # If the assignee or special status changes, re-evaluate the task status
         if self.request.user.role == CustomUser.Role.CHUYEN_VIEN_VAN_PHONG and \
            main_assignee.role == CustomUser.Role.LANH_DAO_PHONG:
             new_instance.trang_thai = NhiemVu.TrangThai.PENDING_ASSIGNMENT_APPROVAL
-            # Set the explicit approver if special workflow is triggered
-            new_instance.id_nguoi_duyet = form.cleaned_data.get('id_nguoi_duyet')
             # Reset assignment approver if the flow changes back to pending
             new_instance.id_nguoi_duyet_giao_viec = None
         else:
@@ -1163,7 +1201,6 @@ class NhiemVuUpdateView(LoginRequiredMixin, UpdateView):
             new_instance.trang_thai = NhiemVu.TrangThai.ASSIGNED
             # A non-special-flow task has no separate assignment approver
             new_instance.id_nguoi_duyet_giao_viec = None
-            new_instance.id_nguoi_duyet = None # Clear explicit approver if not special workflow
 
         # Set id_phong_ban_lien_quan based on main_assignee's department
         if main_assignee.phong_ban:

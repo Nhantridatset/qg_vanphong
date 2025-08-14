@@ -20,12 +20,41 @@ class HoSoCongViecForm(forms.ModelForm):
         if not self.instance.pk: # Only set default for new instances
             self.initial['ngay_bat_dau'] = timezone.now()
 
-        if self.request_user and self.request_user.phong_ban:
-            # Filter id_nguoi_quan_ly to show only LANH_DAO_PHONG from the same department
-            self.fields['id_nguoi_quan_ly'].queryset = CustomUser.objects.filter(
-                phong_ban=self.request_user.phong_ban,
-                role=CustomUser.Role.LANH_DAO_PHONG
-            )
+        if self.request_user:
+            # Filter id_nguoi_quan_ly to show appropriate approver roles
+            if self.request_user.role == CustomUser.Role.LANH_DAO_CO_QUAN:
+                # Lãnh đạo Cơ quan can assign to any leader
+                self.fields['id_nguoi_quan_ly'].queryset = CustomUser.objects.filter(
+                    role__in=[
+                        CustomUser.Role.LANH_DAO_CO_QUAN,
+                        CustomUser.Role.LANH_DAO_VAN_PHONG,
+                        CustomUser.Role.LANH_DAO_PHONG
+                    ]
+                )
+            elif self.request_user.role == CustomUser.Role.LANH_DAO_VAN_PHONG:
+                # Lãnh đạo Văn phòng can assign to leaders within their agency
+                if self.request_user.phong_ban and self.request_user.phong_ban.co_quan:
+                    self.fields['id_nguoi_quan_ly'].queryset = CustomUser.objects.filter(
+                        co_quan=self.request_user.phong_ban.co_quan,
+                        role__in=[
+                            CustomUser.Role.LANH_DAO_VAN_PHONG,
+                            CustomUser.Role.LANH_DAO_PHONG
+                        ]
+                    )
+                else:
+                    self.fields['id_nguoi_quan_ly'].queryset = CustomUser.objects.none()
+            elif self.request_user.role == CustomUser.Role.LANH_DAO_PHONG:
+                # Lãnh đạo Phòng can assign to leaders within their department
+                if self.request_user.phong_ban:
+                    self.fields['id_nguoi_quan_ly'].queryset = CustomUser.objects.filter(
+                        phong_ban=self.request_user.phong_ban,
+                        role=CustomUser.Role.LANH_DAO_PHONG
+                    )
+                else:
+                    self.fields['id_nguoi_quan_ly'].queryset = CustomUser.objects.none()
+            else:
+                # Other roles (e.g., Chuyen Vien) cannot select id_nguoi_quan_ly
+                self.fields['id_nguoi_quan_ly'].queryset = CustomUser.objects.none()
 
 class KeHoachForm(forms.ModelForm):
     class Meta:

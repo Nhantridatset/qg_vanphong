@@ -1,4 +1,5 @@
 from django.db import models
+from users.models import CustomUser
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
@@ -156,9 +157,9 @@ class NhiemVu(models.Model):
 
     @property
     def completion_approver(self):
-        if self.is_quy_trinh_dac_biet:
-            return self.id_nguoi_duyet # Use the explicitly selected approver
-        return self.id_nguoi_giao_viec
+        # The person who approved the assignment is the one to approve completion.
+        # This assumes id_nguoi_duyet is set after assignment approval.
+        return self.id_nguoi_duyet
 
 class BinhLuan(models.Model):
     nhiem_vu = models.ForeignKey(NhiemVu, on_delete=models.CASCADE, related_name='binh_luan')

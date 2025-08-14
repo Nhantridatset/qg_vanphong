@@ -71,7 +71,7 @@
         </div>
 
         <div class="mt-8 flex items-center justify-start space-x-4">
-            {% if object.trang_thai == 'PENDING_ASSIGNMENT_APPROVAL' and request.user.is_authenticated and request.user.role == 'LANH_DAO_CO_QUAN' or object.trang_thai == 'PENDING_ASSIGNMENT_APPROVAL' and request.user.is_authenticated and request.user.role == 'LANH_DAO_VAN_PHONG' %}
+            {% if can_approve_assignment %}
                 <a href="{% url 'approve-assignment' object.pk %}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                     Phê duyệt phân công
                 </a>
