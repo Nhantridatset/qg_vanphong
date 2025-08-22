@@ -107,7 +107,7 @@ class NhiemVu(models.Model):
     id_nguoi_tao = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='nhiem_vu_da_tao', verbose_name=_('Người tạo'))
     id_nguoi_giao_viec = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='nhiem_vu_da_giao', verbose_name=_('Người giao việc'))
     id_nguoi_xu_ly_chinh = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='nhiem_vu_xu_ly_chinh', verbose_name=_('Người xử lý chính'))
-        nguoi_dong_xu_ly = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='nhiem_vu_dong_xu_ly', verbose_name=_('Người đồng xử lý'))
+    nguoi_dong_xu_ly = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='nhiem_vu_dong_xu_ly', verbose_name=_('Người đồng xử lý'))
     id_phong_ban_lien_quan = models.ForeignKey(PhongBan, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Phòng ban liên quan'))
 
     id_nhiem_vu_cha = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='sub_tasks', verbose_name=_('Nhiệm vụ cha'))
