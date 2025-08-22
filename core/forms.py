@@ -128,7 +128,7 @@ class NhiemVuForm(forms.ModelForm):
         fields = [
             'ten_nhiem_vu', 'mo_ta', 'muc_do_uu_tien',
             'ngay_bat_dau', 'ngay_ket_thuc',
-            'id_ke_hoach', 'id_nguoi_xu_ly_chinh', 'nguoi_dong_xu_ly', 'id_nhiem_vu_cha',
+            'id_ke_hoach', 'id_nguoi_xu_ly_chinh', 'id_nhiem_vu_cha',
             'thoi_gian_uoc_tinh',
             'is_recurring', 'recurring_frequency', 'recurring_until',
             'id_nguoi_duyet', # New field for explicit approver
